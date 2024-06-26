@@ -1,0 +1,634 @@
+One : yī 一
+Two : èr 二
+Three : sān 三
+Four : sì 四
+Five : wǔ 五
+Six : liù 六
+Seven : qī 七
+Eight : bā 八
+Nine : jiǔ 九
+Ten : shí 十
+Hundred : bǎi 百
+Thousand : qiān 千
+Buy : mǎi 买
+Money : yuán 元 / qián 钱
+Can : kě yǐ 可以 / néng 能
+At : zài 在
+Will : huì 会
+Will See : huì jiàn 会见
+Will Be At : huì zài 会在
+Will Live : huì zhù 会住
+Do : zuò 做
+Cook : zuò fàn 做饭 /  zhǔ fàn 煮饭
+[Past] : le 了
+Did : zuò le 做了
+Saw : jiàn le 见了
+Every : měi 每
+Every Time : měi cì 每次
+Previous : shàng gè 上个
+Next : xià gè 下个
+And : hé 和
+Or : huò zhě 或者
+But : dàn shì 但是
+Only : dàn 但
+If : rú guǒ 如果
+Then : rán hòu 然后
+For : wèi 喂
+Have : yǒu 有
+Interesting : yǒu qù 有趣
+Funny : hǎo xiào 好笑
+Very Funny : xiào sǐ 笑死
+Smile : xiào 笑
+Touch : chù mō 触摸
+Intimate Touch : fǔ mō 抚摸
+Kiss : qīn 亲
+Calm / Peaceful : ān 安
+Strong : qiáng zhuàng 强壮
+Weak : xū ruò 虚弱 / cuì ruò 脆弱
+Angry : shēng qì 生气
+Scared : hài pà 害怕
+What? : shén me 什么
+Please : qǐng 请
+Excuse Me : qǐng wèn 请问
+[Ask] : wèn 问
+Yes / No ? : má 吗
+Name : míng zì 名字
+And You? : nǐ ne 你呢
+You : nǐ 你
+You all : nǐ men 你们
+He : tā 他
+She : tā 她
+It : tā 它
+They : tā men 他们
+We : wǒ men 我们
+Everybody : měi gè rén 每个人
+Am / Called : jiào 叫
+I : wǒ 我
+Thank You : xiè xiè 谢谢
+See : jiàn 见 / jiàn dào 见到
+Not : bù 不
+No : bù shì 不是
+Yes : shì de 是的
+You're Welcome : bù kè qì 不客气
+Don't Have : méi yǒu 没有
+Want : yào 要
+Don't Want : bù yào 不要
+Need : xū yào 需要
+Must : bì xū 必须
+Know : zhī dào 知道
+Don't Know : bù zhī dào 不知道
+Goodbye : zài jiàn 再见 /  zài huì 再会
+Hello : nǐ hǎo 你好
+Is or Not Is : shì bù shì 是不是
+Want or Don't Want : yào bù yào 要不要
+Clear : míng bái 明白
+Understand : dǒng 懂
+Don't Understand : tīng bù dǒng 听不懂
+Feel (Think) : jué de 绝的
+Think : xiǎng 想
+Right Now : xiàn zài 现在 / zhèng zài 正在
+Just Now / A Moment Ago : gāng cái 刚才
+Now : jīn 今
+Today : jīn tiān 今天
+Yesterday : zuó tiān 昨天
+Tomorrow : míng tiān 明天
+Every Day : měi tiān 每天 / yī tiān tiān 一天天
+This Year : jīn nián 今年
+Last Year : qù nián 去年
+Next Year : míng nián 明年
+Year : nián 年
+Month : yuè 月
+Week : xīng qī 星期
+Sunday : xīng qī tiān 星期天 / xīng qī rì 星期日
+Monday : xīng qī yī 星期一
+Tuesday : xīng qī èr 星期二
+Wednesday : xīng qī sān 星期三
+Thursday : xīng qī sì 星期四
+Friday : xīng qī wǔ 星期五
+Saturday : xīng qī liù 星期六
+Weekend : zhōu mò 周末
+Time : shí jiān 时间 / shí hòu 时候
+Hour : diǎn 点
+What Time? : jǐ diǎn 几点
+Minute : fēn zhōng 分钟
+Long Time : hǎo jiǔ 好久
+OK : hǎo de 好的 / hǎo le 好了
+Where : nǎ r 哪儿 / nǎ li 哪里
+Which : nǎ 哪
+There : nà r 那儿 / nà li 那里
+That : nà 那
+Here : zhè r 这 / zhè li 这 / zhè biān 这边
+This : zhè / zhè gè 这个
+Really : zhēn de 真的
+All / Both : dōu 都
+Much : duō 多
+Very Much : hěn duō 很多
+Too Much : tài duō 太多
+How Much : duō shǎo 多少
+This Much : zhè me 这么
+So / Too : tài 太
+Cheap : piān yí 偏移
+Poor : pín kùn 贫困 / pín qióng 贫穷
+Expensive : guì 贵
+Rich : yǒu qián 有钱 / f y 富裕
+Scammer : piàn zǐ 骗子
+Correct : duì 对
+Sorry : duì bù qǐ 对不起
+My Bad : bù hǎo yì sī 不好意思
+Life / Raw / Scholar : shēng 生
+Learn : xué xí 学习
+Student : xué shēng 学生
+Teacher : lǎo shī 老师
+Doctor : yī shēng 医生
+Person : rèn 人
+Know (person) / Meet : rèn shí 认识
+Old : lǎo 老
+Love : ài 爱
+Small : xiǎo 小
+Big : dà 大
+Short : āi 哎 / duǎn 短
+Long : cháng 长
+Tall : gāo 高
+Slow : màn 慢
+Fast / Rapid : kuài 快
+Beautiful : piào liàng 漂亮
+Very : hěn 很 / [more] fēi cháng 非常
+Happy : gāo xìng 高兴 / kāi xīn 开心 / kuài lè 快乐 / xīn fù 心腹
+Hurt : tòng 痛
+Like : xǐ huān 喜欢
+Cute : kě ài 可爱
+Comfortable : shū fú 舒服
+Heart : xīn 心
+Half : bàn 半
+Face (Pride / Status / to lose face) : miàn zǐ 面子
+Country : guó 国
+Language : yǔ 语
+Speech : huà 话
+Mandarin : pǔ tòng huà 普通话 / hàn yù 汉语 / zhōng wén 中文
+Chinese : zhōng 中
+English : yīng yǔ 英语
+Centre : zhōng jiān 中间 / zhōng xīn 中心
+First / Once : yī cì 一次
+Once Again : zài yī cì 再一次
+Say Once Again : zài shuō yī cì 再说一次
+Talk : shuō 说
+Most : zuì 最
+Near : jìn 近
+Recently : zuì jìn 最近
+Still : hái 还 / hái shì 还是
+Also : yě 也
+No Problem : méi wèn tí 没问题
+Doesn't Matter : méi guān xì 没关系
+Not Bad : bù cuò 不错
+How : zěn me 怎么
+How Are You? : zěn me yàng 怎么样
+Appearance : yàng 样
+Who : shéi 谁 / shuí 谁
+How To Get There? : zěn me zǒu 怎么走
+Walk : zǒu 走
+Own : suǒ yǒu 所有
+From : cóng 从
+Come From : lái zǐ 来子
+To Go : chū qù 出去
+To Come Out : chū lái 出来
+To Start Going, Set Off : chū fā 出发
+To Get Out Of Bed : qǐ chuáng 起床
+Throw : rēng 扔
+Sit : zuò 坐
+Hike : tú bù 徒步
+Run : páo bù 跑步
+Swim : yóu yǒng 游泳
+Ball : qiú 球
+Tennis : wǎng qiú 网球
+Rock Climb : pān yán 攀岩
+Camp : lù yíng 露营
+Travel : lù yóu 路由
+Biking : dān chē 单车
+Driving : kāi chē 开车
+Car : qì chē 汽车 / xiǎo chē 小车
+Truck : dà chē 大车
+Bus : bā shì 巴适
+Train : liè chē 列车 / huǒ chē 火车
+Boat : chuán 船
+Airplane : fēi jī 飞机
+Helicopter : zhí shēng jī 直升机
+Machine : jī 机
+Speed : sù dù 速度
+Sidewalk : zǒu dào 走到
+Road : gōng lù 公路
+Highway : gāo sù gōng lù 高速公路
+Path : lù 路
+Route / To Get To : dào 到
+Straight : yī zhí 一直
+Only / Merely : zhǐ shì 只是
+Just / Exactly : gāng hǎo 刚好
+Electricity : diàn 电
+Phone : diàn huà 电话
+Mobile Phone : shǒu jī 手机
+Movie : diàn yǐng 电影
+TV : diàn shì 电视
+Photograph : zhào piàn 照片
+Game : yóu xì 游戏
+Computer : diàn nǎo 电脑
+Brain : nǎo 脑
+Bed : chuáng 床
+Chair : yǐ zǐ 椅子
+Table : zhuō zǐ 桌子
+Fridge : bīng xiāng 冰箱
+Public : gōng 公
+Company : gōng sī 公司
+Business : shēng yì 生意
+Office : bàn gōng shì 办公室
+Hospital : yī yuàn 医院
+School : xué xiào 学校
+Restaurant : fàn diàn 饭店 / fàn guǎn 饭馆
+Bank : yín xíng 银行
+Building : guǎn 管
+Supermarket : chāo shì 超市
+Market : shì cháng 市场
+Bathroom : xǐ shǒu jiān 洗手间
+Toilet : cè suǒ 厕所
+Room : fáng jiān 房间
+Courtyard / Public Space : yuán 园
+Garden : huā yuán 花园
+Fruit Garden : guǒ yuán 果园
+Flower : huā 花
+Home : jiā 家
+Live : zhù 住
+Door : mén 门
+Open : kāi 开
+Close : guān 关
+This Side : zhè biān 这边
+Beside : páng biān 旁边
+Behind : hòu biān 后边
+Front : qián biān 前边
+Above : shàng biān 上边
+Below : xià biān 下边
+Right : yòu biān 右边
+Left : zuǒ biān 左边
+Towards : wǎng 往
+Inside : lǐ 里 / lǐ biān 里边
+Surface : miàn 面
+Slide : huá 滑
+Ski : huá xuě 滑雪
+Ice Skate : huá bīng 滑冰
+Play : wán 玩
+Fun : hǎo wán 好玩
+Work : gōng zuò 工作 / bān gōng 班工
+Work Shift / Team : bān 班
+Start Work : shàng bān 上班
+Finish work : xià bān 下班 / fàng bān 放班
+Start School : shàng xué 上学
+Finish School : fàng xué 放学 / xià 下学
+Relax : fàng sōng 放松
+Help : bāng zhù 帮助 / bāng máng 帮忙
+Wait : děng hòu 等候 / děng dài 等待
+Sleep : shuì jiào 睡觉
+Sleepy : kùn 困
+Tired : lèi 累
+Look : kàn 看
+Look Around / Browse : kàn kàn 看看 / guǎn guǎn 管管 / guǎn kàn 管看
+Write : xiě zuò 写作
+Book : shū 书
+Notebook : běn zǐ 本子
+Pen : gāng bǐ 钢笔
+Listen : tīng 听
+Hear : tīng dào 听到
+Sing : chàng 唱
+Sound : yīn 音
+Echo : huí yīn 回音
+Music : yīn yuè 音乐
+Song : gē 歌
+Sing Song : chàng gē 唱歌
+Jump : tiào 跳
+Dance : tiào wǔ 跳舞
+Grab : ná dào 拿到
+Hold : bǎ 把
+Give : sòng 送 / gěi 给
+Use : yòng 用
+Move : dòng 动
+Animal : dòng wù 动物
+Pet : chǒng wù 宠物
+Seek : zhǎo 找
+Together : yī qǐ 一起
+Try : shì shì kàn 试试看 / cháng shì 尝试
+Fall : diào 掉
+Easy : róng yì 容易
+Hard : xīn kǔ 辛苦
+Lucky : xìng yùn 幸运
+Busy : máng 忙
+Outside : wài miàn 外面
+Inside : lǐ miàn 里面
+Because : yīn wéi 因为
+Clean : gàn jìng 干净
+Hat : mào zǐ 帽子
+T-shirt : tǐ xù 体恤
+Jacket : jiā kè 加课
+Pants : kù zǐ 裤子
+Shoes : xié zǐ 鞋子
+Glasses : yǎn jìng 眼镜
+Eyes : yǎn jīng 眼睛
+Bag : bāo bāo 包包
+Colour : sè 色
+Black : hēi sè 黑色
+White : bái sè 白色
+Red : hóng sè 红色
+Blue : lán sè 蓝色
+Green : lǜ sè 绿色
+Orange : chéng sè 橙色
+Yellow : huáng sè 黄色
+Why : wéi shén me 为什么
+Don't : bié 别
+Head : tou 头
+Back : hòu bèi 后背
+Arm : shǒu bì 手臂
+Hand : shǒu 手
+Leg : tuǐ 腿
+Foot : jiǎo 脚
+Belly : dù zǐ 肚子
+Ear : ěr 耳
+Mouth : kǒu 口
+Saliva : kǒu shuǐ 口水
+Thirsty : kǒu kě 口渴
+Hungry : è 饿
+Eat : chī 吃
+Ate : chī le 吃
+Tasty : hǎo chī 好吃
+Drink : hē 喝
+Good Drink : hǎo hē 好喝
+Full : bào le 爆了
+Too Full : tāi bào le 胎爆了
+Food / Meal : fàn 饭 / cān 餐
+Fragrant : xiāng 香
+Dinner : wǎn cān 晚餐
+Breakfast : zǎo cān 早餐
+Lunch : wǔ cān 午餐
+Rice : mǐ fàn 米饭
+Noodles : miàn tiáo 面条
+Bread : miàn bāo 面包
+Fish : yú 鱼
+Vegetable : cài 菜
+Fried : chǎo 炒
+Meat : ròu 肉
+Fat : féi ròu 肥肉
+Beef : niú ròu 牛肉
+Chicken (Meat) : jī ròu 鸡肉
+Pork : zhū ròu 猪肉
+Duck (Meat) : yā zǐ  ròu 鸭子肉
+Cow : nǎi niú 奶牛
+Chicken (Animal) : jī 鸡
+Pig : zhū 猪
+Duck (Animal) : yā zǐ 鸭子
+Dog : gǒu gǒu 狗狗
+Cat : māo māo 猫猫
+Turtle : wù guī 乌龟
+Bird : xiǎo niǎo 小鸟
+Horse : mǎ 马
+Chicken Egg : jī dàn 鸡蛋
+Oats : mài piàn 麦片
+Sweets / Candy : táng 糖
+Ice-Cream : bīng jī líng 冰激凌
+Fruit : shuǐ guǒ 水果
+Apple : píng guǒ 苹果
+Orange : chéng zǐ 橙子
+Banana : xiāng jiāo 香蕉
+Strawberry : cǎo méi 草莓
+Blueberry : lán méi 蓝莓
+Watermelon : xī guā 西瓜
+Lettuce : shēng cài 生菜
+Cabbage : bái cài 白菜
+Chinese Cabbage : dà bái cài 大白菜
+Cucumber : huáng guā 黄瓜
+Mushroom : mó gū 蘑菇
+Tomato : fān qié 番茄
+Carrot : hú luó bo 胡萝卜
+Potato : tǔ dòu 土豆
+Onion : yáng cōng 洋葱
+Peanut : huā shēng 花生
+Grape : pú táo 葡萄
+Nectarine : yóu táo 油桃
+Peach : táo zǐ 桃子
+Cherry : yīng táo 樱桃
+Apricot : xìng zǐ 性子
+Mango : máng guǒ 芒果
+Pear : lí zǐ 梨子
+Chestnut : lì zǐ 栗子
+Walnut : hé táo 核桃
+Avocado : niú yóu guǒ 牛油果
+Lychee : lì zhī 荔枝
+Water : shuǐ 水
+Tea : chá 茶
+Coffee : kā fēi 咖啡
+Alcohol : jiǔ jīng 酒精
+Beer : pí jiǔ 啤酒
+Milk : niú nǎi 牛奶
+Cheese : qǐ sì 起司
+Cookie : qū qí 曲奇
+Hamburger : hàn bǎo 汉堡
+Pizza : pī sà 披萨
+Chocolate : qiǎo kè lì 巧克力
+Yoghurt : suān niú nǎi 酸牛奶
+Cake : dàn gāo 蛋糕
+Sandwich : sān wén zhì 三文治
+Pie : pài 派
+Soup : tāng 汤
+Steamed Bun : miàn tou 面头
+Bun : bāo zǐ 包子
+Salt : yán 盐
+Salted : xián 咸
+Sweet : tián 甜
+Sour : suān 酸
+Spicy : là 辣
+Spicy Chili : là jiāo 辣椒
+Hot : rè 热
+Cold : lěng 冷
+Ice : bīng 冰
+Hotpot : huǒ guō 火锅
+Dumpling : shuǐ jiǎo 水饺 / jiǎo zǐ 饺子
+Boiling Water : kāi shuǐ 开水
+Raw Meat : shēng ròu 生肉
+Friend : péng yǒu 朋友
+Girlfriend : nù péng yǒu 怒朋友
+Boyfriend : nán péng yǒu 男朋友
+Wife : qí zǐ 棋子 / lǎo pó 老婆
+Husband : zhàng fú 丈夫 / lǎo gōng 老公
+Air : qì 气
+Weather : tiān qì 天气
+Cloud : yún 云
+Sky : tiān kōng 天空
+Sun : tài yáng 太阳 / rì 日
+World : shì jiè 世界
+Morning : zǎo shàng 早上
+Before Mid-day : shàng wǔ 上午
+Mid-day : zhōng wǔ 中午
+Afternoon : xià wǔ 下午
+Evening : wǎn shàng 晚上
+Down : xià 下
+Up : shàng 上
+Rain : xià yù 下雨
+Wind : fēng 风
+Sunny Day : qíng tiān 晴天
+Forest : sēn lín 森林
+Tree : dà shù 大树
+Bush : xiǎo shù 小树
+Flower : huā 花
+Stream / Creek : xī 溪
+Small River : hé 河
+Big River : jiāng 江
+Ocean : dà hǎi 大海
+Mountain : shān 山
+Rock : shí tou 石头
+Grass : cǎo 草
+Type / Species / Seed : zhòng 种
+To Plant : zhòng zhí 种植
+Star : xīng xīng 星星
+Permit / Allow : ràng 让
+Shopping : gòu wù 购物
+Put Into : fàng jìn 放进
+Looking Forward To / Expecting : qī dài 期待
+A Little : yī diǎn r 一点儿
+Very Little : yī diǎn diǎn 一点点
+New Zealand : xīn xī lán 新西兰
+America : měi guó 美国
+England : yīng guó 英国
+Foreigner : lǎo wài 老外 / wài guó rén 外国人
+Congratulations : gōng xǐ 恭喜
+Things / Stuff : dōng xī 东西
+Smart : cōng míng 聪明
+Stupid : bèn 笨
+Foolish / Silly : shǎ 傻
+Fat : pàng 胖
+Skinny : shòu 瘦
+Sad / Unwell : nán guò 难过
+Cry : kū 哭
+Crazy : fēng kuáng 疯狂
+To Hurt : shāng hài 伤害
+Brave : yǒng gǎn 勇敢
+Shutup : bì zuǐ 闭嘴
+Awesome : jué le 绝了 / lì hài 厉害 / liù liù liù 六六六
+Wow : wā sāi 哇塞
+Worry : dàn xīn 担心
+Careful : xiǎo xīn 小心
+Achieve : zuò dào 做到
+That's Right / Sure : méi cuò 没错
+Truly / Actually : shí zài 实在
+Amusing : hǎo wán 好玩
+Prepare : zhǔn bèi 准备
+To Cross / To Pass Time : guò 过
+Task / Homework : zuò yè 作业
+Confused : yūn 晕
+Hope : xī wàng 希望
+Embarrassed : gān gà 尴尬
+Guitar : jí tā 吉他
+Sofa : shà fā 沙发
+Microphone : mài kè fēng 麦克风
+Pull : lā 啦
+Throw : rēng 扔
+Get Up / Start : qǐ 起
+Rubbish : lā jī 垃圾
+Fire : huǒ 火
+Trough : cǎo 草
+Sink : shuǐ cǎo 水草
+Pot : hú 壶
+Kettle : shuǐ hú 水壶
+Return : huí 回 / huí lái 回赖
+When : dāng 当
+Soon : mǎ shàng 马上
+Respect : jìng 敬
+Decide : jué dìng 决定
+Welcome : huān yíng 欢迎
+Find : zhǎo dào 找到
+Finally / At Last : zuì hòu 最后
+The Best : zuì hǎo 最好
+Heavy : zhòng 重
+Important : zhòng yào 重要
+Word : zì 字
+Being : zhèng zài 正在
+Knowledge : zhī shi 知识
+Station : zhàn 站
+Some : yǒu xiē 有些 / yǒu de 有的 / yī xiē 一些
+Many : hěn duō 很多
+A While : yí huì r 一会儿 / yí xià r 一下儿
+Clothes : yī fu 衣服
+New : xīn shēng 新生
+Next Time : xià cì 下次
+Wash : xǐ 洗
+Forget : wàng jì 忘记
+Forgot : wàng jì le 忘记了
+Fruit Juice : guǒ zhī 果汁
+Joking : kāi wán xiào 开玩笑
+Stand Up : qǐ lái 起来
+House : fáng zi 房子
+Washed : xǐ guò le 洗过了
+Fart : fàng pì 放屁
+Tofu : dòu fǔ 豆腐
+Soft Tofu : dòu huā 豆花
+Hair : tou fā 头发
+Inside Car : chē shàng 车上
+Train Station : chē zhàn 车站
+Hobby : ài hǎo 爱好
+Daytime : bái tiān 白天
+Bag : bāo 包
+No Need To : bù yòng 不用
+Often : cháng cháng 尝尝
+Boring : bù hǎo wán 不好玩
+Mood : xīn qíng 心情
+Dark : hēi àn 黑暗
+Older Brother : gē gē 哥哥
+Younger Brother : dì dì 弟弟
+Older Sister : jiě jiě 姐姐
+Younger Sister : mèi mèi 妹妹
+Kids : xiǎo péng yǒu 小朋友
+Read : dú shū 读书
+End / Termination : zhōng zhǐ 終止
+Kitchen : chú fáng 厨房
+Attack : jìn gōng 进攻
+Light : guāng 光
+Ordinary / General : pǔ tòng 普通
+Quiet : ān jìng 安静
+Relief : fàng xīn 放心
+Care : guān xīn 关心 / guān huái 关怀
+Health : wèi shēng 卫生 / jiàn kāng 健康
+Disease : bìng zhèng 病症
+Far : yuǎn 远
+Same : yí yàng 一样
+Rest : xiū xi 休息
+Comb : shū zǐ 梳子
+Before : zhī qián 之前
+After : hòu lái 後來
+Later : chí yī diǎn 迟一点
+Monkey : hóu zǐ 猴子
+Rabbit : tù zǐ 兔子
+Panda : xióng māo 熊猫
+Medicine : yào 药
+Washing Machine : xǐ jī 洗机
+Which : nǎ xiē 哪些
+Miss : xiǎng niàn 想念
+Thinking About You : xiǎng zhe nǐ 想著你
+Gift : lǐ wù 礼物
+Pass Through / Pass Test : tōng guò 通过
+Elevator / Escalator : diàn tī 电梯
+Scissors : jiǎn dāo 剪刀
+Knife : dāo 刀
+Safe : ān quán 安全
+On Time : àn shí 按时
+To Arrange / Plan : ān pái 安排
+Protect : bǎo hù 保护
+Meet : jiàn miàn 见面
+Fair : gōng píng 公平
+Dirt / Earth : chén 陈
+Take your time : màn màn lái 慢慢来
+Holiday : gōng xiū 公休
+Recreational Vehicle (RV) : fáng chē 房车
+Politics : zhèng zhì 政治
+Ridiculous, Absurd : huāng miù 荒谬
+Famous : zhù míng 著名
+Nature : zì rán 自然
+Desert : shā mò 沙漠
+Shower : xǐ zǎo 洗澡
+Massage : àn mó 按摩
+
+#with me
+#sometimes
+#lao zi.. ?
+
