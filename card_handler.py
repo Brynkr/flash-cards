@@ -112,3 +112,21 @@ class CardHandler:
          if answer == input_val:
             return True
       return False
+
+
+   def getHanZi(self, value):
+      answers = ""
+      value_ary = value.split("/")
+      for val in value_ary:
+         val = val.strip()
+         word_len = len(val.split(" "))
+         if word_len == 2:
+            answer = val[-1:]
+         elif word_len == 3:
+            answer = val[-2:]
+         elif word_len == 4:
+            answer = val[-3:]
+         if answer != None:
+            answers = answers + answer.strip()
+      return answers
+

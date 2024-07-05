@@ -21,49 +21,50 @@ class LayoutMaker:
                        [psg.Button("Input Study", size=(12, 2)),
                         psg.Button("Auto", size=(12, 2)),
                         psg.Button("Auto Priority", size=(12, 2))],
-                       [psg.Button("Free View", size=(12, 2)),
-                        psg.Button("Add Cards", size=(12, 2)),
-                        psg.Button("Fullscreen", size=(12, 2))],
-                       [psg.Button("Exit", size=(12, 2))] ]
+                       [psg.Button("Add Cards", size=(12, 2)),
+                        psg.Button("Fullscreen", size=(12, 2)),
+                        psg.Button("Exit", size=(12, 2))] ]
       return { "start" : start_layout }
 
 
-   def display(self, key, value):
+   def display(self, key, value, priority=False):
       front_layout = [ [psg.VPush()],
                        [psg.Text(str(key), font=18)],
                        [psg.Text("")],
                        [psg.Button("Answer", focus=True, bind_return_key=True, size=(40, 4)),
                         psg.Button("Return", size=(16, 4))],
                        [psg.VPush()] ]
-      back_layout = [ [psg.VPush()],
-                      [psg.Text(str(key) + ':', font='Any 28')],
-                      [psg.Text(str(value), font='Any 28', text_color='yellow')],
-                      [psg.Text("")],
-                      [psg.Button("Next", focus=True, bind_return_key=True, size=(32, 3)),
-                       psg.Button("Priority", size=(8, 3)),
-                       psg.Button("Return", size=(8, 3))],
-                      [psg.VPush()] ]
-      priority_back_layout = [ [psg.VPush()],
+      if priority:
+         back_layout = [ [psg.VPush()],
                                [psg.Text(str(key) + ':', font='Any 28')],
                                [psg.Text(str(value), font='Any 28', text_color='yellow')],
                                [psg.Text("")],
                                [psg.Button("Next", focus=True, bind_return_key=True, size=(15, 3)),
                                 psg.Button("Return", size=(15, 3))],
                                [psg.VPush()] ]
+      else:
+         back_layout = [ [psg.VPush()],
+                         [psg.Text(str(key) + ':', font='Any 28')],
+                         [psg.Text(str(value), font='Any 28', text_color='yellow')],
+                         [psg.Text("")],
+                         [psg.Button("Next", focus=True, bind_return_key=True, size=(32, 3)),
+                          psg.Button("Priority", size=(8, 3)),
+                          psg.Button("Return", size=(8, 3))],
+                         [psg.VPush()] ]
+      
       return { "front" : front_layout,
-               "back" : back_layout,
-               "priority_back" : priority_back_layout }
+               "back" : back_layout }
 
 
    def input(self, key, value):
       input_front_layout = [ [psg.VPush()],
                              [psg.Text(str(key), font=18)],
                              [psg.Input(size=(40, 4))],
-                             [psg.Button("Answer", focus=True, bind_return_key=True, size=(40, 4)),
-                              psg.Button("Return", size=(16, 4))],
+                             [psg.Button("Answer", focus=True, bind_return_key=True, size=(7, 3)),
+                              psg.Button("Return", size=(7, 3))],
                              [psg.VPush()] ]
       input_back_layout = [ [psg.VPush()],
-                            [psg.Text(str(key) + ':', font='Any 28')],
+                            [psg.Text(str(key) + ':', font='Any 28', text_color='green2')],
                             [psg.Text(str(value), font='Any 28', text_color='yellow')],
                             [psg.VPush()] ]
       incorrect_answer_layout = [ [psg.VPush()],
@@ -83,18 +84,6 @@ class LayoutMaker:
                       [psg.Text(str(value), font='Any 28', text_color='yellow')],
                       [psg.VPush()] ]
       return { "auto" : auto_layout }
-
-
-   def freeView(self, cards):
-      free_view_layout = []
-      scroll_len = 0
-      for key, value in cards.items():
-         free_view_layout.append([psg.Button(key, size=(40, 4))])
-         scroll_len = scroll_len + 1
-
-      column = [[psg.Text("{}".format(i))] for i in range(scroll_len)]
-      free_view_layout.append([psg.Column(column, scrollable=True, vertical_scroll_only=True)])
-      return { "free view" : free_view_layout }
 
 
    def add(self):
@@ -120,6 +109,3 @@ class LayoutMaker:
                "add_cards_back" : add_cards_back_layout,
                "invalid_syntax" : invalid_syntax_layout }
 
-
-   # def column(self, col_len):
-      # column = [[psg.Text("")] for i in range(col_len)]

@@ -118,7 +118,7 @@ Which : nǎ 哪
 There : nà r 那儿 / nà li 那里
 That : nà 那
 Here : zhè r 这 / zhè li 这 / zhè biān 这边
-This : zhè / zhè gè 这个
+This : zhè 这 / zhè gè 这个
 Really : zhēn de 真的
 All / Both : dōu 都
 Much : duō 多
@@ -427,7 +427,7 @@ Cookie : qū qí 曲奇
 Hamburger : hàn bǎo 汉堡
 Pizza : pī sà 披萨
 Chocolate : qiǎo kè lì 巧克力
-Yoghurt : suān niú nǎi 酸牛奶
+Yoghurt : suān nǎi 酸奶
 Cake : dàn gāo 蛋糕
 Sandwich : sān wén zhì 三文治
 Pie : pài 派

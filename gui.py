@@ -4,23 +4,22 @@ import PySimpleGUI as psg
 import constants
 from card_handler import CardHandler
 from layout_maker import LayoutMaker
-
+from voice_handler import VoiceHandler
 
 # TODO
 # Standardise windows
-# TODO - Freeview.. clickable cards
+# Free view.. clickable cards
 # Window Manager class. Create all windows at startup, set sizes. Open/Close depending on mode in use
 # --> Theme viewer, selector
-# sounds API??? - pronounciation
+# sounds API? - pronounciation
 # Test automation!
 
-
 class GUI:
-
    def __init__(self):
       self.fullscreen = False
       self.card_handler = CardHandler()
       self.layout_maker = LayoutMaker()
+      self.voice_handler = VoiceHandler()
       #TODO - default_window_size
       psg.theme("DarkTeal2")
 
@@ -35,10 +34,8 @@ class GUI:
          layouts = self.layout_maker.start()
          window = psg.Window("Flash Cards", layouts["start"],
                              finalize=True, resizable=True, element_justification='c')
-         if self.fullscreen:
-            window.Maximize()
-         else:
-            window.set_size(size=(420, 280))
+         self.setWindowSize(window, 420, 220)
+
          event, values = window.read()
          if event == "Study":
             window.close()
@@ -58,9 +55,6 @@ class GUI:
          elif event == "Auto Priority":
             window.close()
             self.autoStudy(priority=True)
-         elif event == "Free View":
-            window.close()
-            self.freeViewStudy()
          elif event == "Add Cards":
             window.close()
             self.addCards()
@@ -81,32 +75,21 @@ class GUI:
 
       for key, value in cards.items():
          print("front = {}, back = {}".format(key, value))
-         layouts = self.layout_maker.display(key, value)
+         layouts = self.layout_maker.display(key, value, priority)
 
          while True:
             window = psg.Window("Q", layouts["front"], 
                                 finalize=True, resizable=True, element_justification='c')
-            if self.fullscreen:
-               window.Maximize()
-            else:
-               window.set_size(size=(520, 160))
+            self.setWindowSize(window, 520, 160)
+
             event1, values1 = window.read()
             if event1 == "Answer":
+               ### FIXME - self.writeAndPlayAudio(value)
                window.close()
-               if priority:
-                  window = psg.Window("A", layouts["priority_back"],
-                                      finalize=True, resizable=True, element_justification='c')
-               else:
-                  window = psg.Window("A", layouts["back"],
-                                      finalize=True, resizable=True, element_justification='c')
-
-               if self.fullscreen:
-                  window.Maximize()
-               else:
-                  if len(value) <= constants.WORD_LEN_LIM:
-                     window.set_size(size=(520, 210))
-                  else:
-                     window.set_size(size=(640, 210))
+               window = psg.Window("A", layouts["back"],
+                                   finalize=True, resizable=True,
+                                   element_justification='c')
+               self.setWindowSize(window, 640, 210)
                
                event2, values2 = window.read()
                if event2 == "Next":
@@ -141,7 +124,6 @@ class GUI:
 
 
    def autoStudy(self, priority=False):
-      print("autostudy fullscreen={}".format(self.fullscreen))
       while True:
          if priority:
             cards = self.card_handler.getPriorityCards()
@@ -153,61 +135,16 @@ class GUI:
             layouts = self.layout_maker.auto(key, value)
             window = psg.Window("Q", layouts["auto"], location=(950, 700),
                                 finalize=True, resizable=True, element_justification='c')
-            if self.fullscreen:
-               window.Maximize()
-            else:
-               window.set_size(size=(320, 120))
+            self.setWindowSize(window, 320, 120)
             time.sleep(10)
             window.close()
-
-
-   def freeViewStudy(self):
-      cards = self.card_handler.getCards()
-      layouts = self.layout_maker.freeView(cards)
-      free_view_window = psg.Window("Free View", layouts["free view"],
-                                    finalize=True, resizable=True, element_justification='c')
-      if self.fullscreen:
-         free_view_window.Maximize()
-      else:
-         free_view_window.set_size(size=(560, 560))
-      event1, values1 = free_view_window.read()
-
-      for key, value in cards.items():
-         if event1 == key:
-            # free_view_window.close()
-            layouts = self.layout_maker.input(key, value)
-            input_window = psg.Window("Q", layouts["input_front"],
-                                      finalize=True, resizable=True, element_justification='c')
-            if self.fullscreen:
-               input_window.Maximize()
-            else:
-               input_window.set_size(size=(520, 150))
-            event1, values1 = input_window.read()
-            if self.inputAnswerPoll(layouts, value):
-               # tick box.... then continue
-               tickCompleteButton(key)
-
-#FIXME
-   def tickCompleteButton(self, key):
-      cards = self.card_handler.getCards()
-      layouts = self.layout_maker.freeView(cards)
-
-      # todo - update the key button with only 'tick' icon
-
-      psg.Window("Free View", layouts["free view"],
-                 finalize=True, resizable=True, element_justification='c')
-      free_view_window.set_size(size=(560, 560))
-      event1, values1 = free_view_window.read()
 
 
    def addCards(self):
       layouts = self.layout_maker.add()
       window = psg.Window("Add", layouts["add_cards_start"],
                           finalize=True, resizable=True, element_justification='c')
-      if self.fullscreen:
-         window.Maximize()
-      else:
-         window.set_size(size=(280, 100))
+      self.setWindowSize(window, 280, 100)
       event1, values1 = window.read()
       added_status = "start"
       while True:
@@ -242,10 +179,7 @@ class GUI:
       while True:
          window = psg.Window("Q", layouts["input_front"],
                              finalize=True, resizable=True, element_justification='c')
-         if self.fullscreen:
-            window.Maximize()
-         else:
-            window.set_size(size=(520, 150))
+         self.setWindowSize(window, 260, 150)
          event1, values1 = window.read()
 
          if event1 == "Answer":
@@ -253,35 +187,47 @@ class GUI:
                window.close()
                window = psg.Window("A", layouts["input_back"],
                                    finalize=True, resizable=True, element_justification='c')
-               if self.fullscreen:
-                  window.Maximize()
-               else:
-                  if len(value) <= constants.WORD_LEN_LIM:
-                     window.set_size(size=(520, 220))
-                  else:
-                     window.set_size(size=(640, 220))
+               self.setWindowSize(window, 280, 220)
                time.sleep(8)
                window.close()
                # return True / False to indicate if answered correctly? for use in Free View
                return True
-               # break
             else:
                window.close()
                window = psg.Window("Q", layouts["incorrect"],
                                    finalize=True, resizable=True, element_justification='c')
-               if self.fullscreen:
-                  window.Maximize()
-               else:
-                  if len(value) <= constants.WORD_LEN_LIM:
-                     window.set_size(size=(520, 340))
-                  else:
-                     window.set_size(size=(640, 220))
+               self.setWindowSize(window, 640, 220)
                time.sleep(8)
                window.close()
-               # break
+               # return True / False to indicate if answered correctly? for use in Free View
                return False
+
          elif event1 == "Return":
             window.close()
-            return
+            return False
          elif event1 == psg.WIN_CLOSED:
             sys.exit()
+
+
+   def writeAudio(self, value):
+      self.voice_handler.writeTTSChineseFile(self.card_handler.getHanZi(value))
+
+   def playAudio(self, audio_path):
+      self.voice_handler.closeVLC()
+      print("playing {}".format(audio_path))
+      self.voice_handler.playWithVLC(audio_path)
+      # time.sleep(10)
+      # self.voice_handler.closeVLC()
+
+   def writeAndPlayAudio(self, value, audio_path=constants.AUDIO_PATH):
+      print("Writing audio for: {}".format(value))
+      self.writeAudio(value)
+      self.playAudio(audio_path)
+
+
+   def setWindowSize(self, window, default_x=520, default_y=380):
+      if self.fullscreen:
+         window.Maximize()
+      else:
+         window.set_size(size=(default_x, default_y))
+
