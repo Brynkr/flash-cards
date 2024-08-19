@@ -39,15 +39,15 @@ class LayoutMaker:
                                [psg.Text(str(key) + ':', font='Any 28')],
                                [psg.Text(str(value), font='Any 28', text_color='yellow')],
                                [psg.Text("")],
-                               [psg.Button("Next", focus=True, bind_return_key=True, size=(15, 3)),
-                                psg.Button("Return", size=(15, 3))],
+                               [psg.Button("Next", focus=True, bind_return_key=True, size=(46, 4)),
+                                psg.Button("Return", size=(22, 4))],
                                [psg.VPush()] ]
       else:
          back_layout = [ [psg.VPush()],
                          [psg.Text(str(key) + ':', font='Any 28')],
                          [psg.Text(str(value), font='Any 28', text_color='yellow')],
                          [psg.Text("")],
-                         [psg.Button("Next", focus=True, bind_return_key=True, size=(32, 3)),
+                         [psg.Button("Next", focus=True, bind_return_key=True, size=(46, 3)),
                           psg.Button("Priority", size=(8, 3)),
                           psg.Button("Return", size=(8, 3))],
                          [psg.VPush()] ]
@@ -109,3 +109,6 @@ class LayoutMaker:
                "add_cards_back" : add_cards_back_layout,
                "invalid_syntax" : invalid_syntax_layout }
 
+
+   # def column(self, col_len):
+      # column = [[psg.Text("")] for i in range(col_len)]

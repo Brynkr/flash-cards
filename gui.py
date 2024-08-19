@@ -2,22 +2,25 @@ import sys
 import time
 import PySimpleGUI as psg
 import constants
-from card_handler import CardHandler
+from deck_handler import DeckHandler
 from layout_maker import LayoutMaker
 from voice_handler import VoiceHandler
 
 # TODO
 # Standardise windows
-# Free view.. clickable cards
 # Window Manager class. Create all windows at startup, set sizes. Open/Close depending on mode in use
+
+# Categories -- Categories checkboxes, [___] [___]
+# -- category recognition
+
 # --> Theme viewer, selector
 # sounds API? - pronounciation
-# Test automation!
+# Test automation
 
 class GUI:
    def __init__(self):
       self.fullscreen = False
-      self.card_handler = CardHandler()
+      self.deck_handler = DeckHandler()
       self.layout_maker = LayoutMaker()
       self.voice_handler = VoiceHandler()
       #TODO - default_window_size
@@ -35,6 +38,8 @@ class GUI:
          window = psg.Window("Flash Cards", layouts["start"],
                              finalize=True, resizable=True, element_justification='c')
          self.setWindowSize(window, 420, 220)
+
+         self.deck_handler.shuffleDeck()
 
          event, values = window.read()
          if event == "Study":
@@ -67,15 +72,15 @@ class GUI:
 
    def displayCards(self, recent=False, priority=False):
       if recent:
-         cards = self.card_handler.getRecent(100)
+         cards = self.deck_handler.getRecentCards()
       elif priority:
-         cards = self.card_handler.getPriorityCards()
+         cards = self.deck_handler.getPriorityCards()
       else:
-         cards = self.card_handler.getCards()
+         cards = self.deck_handler.getCards()
 
-      for key, value in cards.items():
-         print("front = {}, back = {}".format(key, value))
-         layouts = self.layout_maker.display(key, value, priority)
+      for card in cards:
+         print("front = {}, back = {}".format(card.getEnglish(), card.getChinese()))
+         layouts = self.layout_maker.display(card.getEnglish(), card.getChinese(), priority)
 
          while True:
             window = psg.Window("Q", layouts["front"], 
@@ -96,7 +101,7 @@ class GUI:
                   window.close()
                   break
                if event2 == "Priority":
-                  self.card_handler.addPriorityCard(key, value)
+                  self.deck_handler.addPriorityCard(key, value)
                   window.close()
                   break
                elif event2 == psg.WIN_CLOSED or event2 == "Return":
@@ -114,25 +119,27 @@ class GUI:
 
 
    def inputStudy(self):
-      for key, value in self.card_handler.getCards().items():
-         print("front = {0}, back = {1}".format(key, value))
-         layouts = self.layout_maker.input(key, value)
-         self.inputAnswerPoll(layouts, value)
+      for card in self.deck_handler.getCards():
+         print("front = {0}, back = {1}".format(card.getEnglish(), card.getChinese()))
+         layouts = self.layout_maker.input(card.getEnglish(), card.getChinese())
+         if self.inputAnswerPoll(layouts, card.getChinese()) == "Return":
+            return
 
-      completed_window = self.layout_maker.completed()
+      completed_window = self.layout_maker.completed()    # TODO - Could show correct/incorrect tally
       event_complete, values_complete = completed_window.read()
 
 
+   # TODO - auto return button
    def autoStudy(self, priority=False):
       while True:
          if priority:
-            cards = self.card_handler.getPriorityCards()
+            cards = self.deck_handler.getPriorityCards()
          else:
-            cards = self.card_handler.getCards()
+            cards = self.deck_handler.getCards()
 
-         for key, value in cards.items():
-            print("front = {0}, back = {1}".format(key, value))
-            layouts = self.layout_maker.auto(key, value)
+         for card in cards:
+            print("front = {0}, back = {1}".format(card.getEnglish(), card.getChinese()))
+            layouts = self.layout_maker.auto(card.getEnglish(), card.getChinese())
             window = psg.Window("Q", layouts["auto"], location=(950, 700),
                                 finalize=True, resizable=True, element_justification='c')
             self.setWindowSize(window, 320, 120)
@@ -153,7 +160,7 @@ class GUI:
             if values1[0].find(":") > 0:  # TODO, more syntax checking..
                if added_status != "start":
                   new_window.close()
-               self.card_handler.addCards(values1[0] + "\n")
+               self.deck_handler.addCards(values1[0] + "\n")
                new_window = psg.Window("Add", layouts["add_cards_back"],
                                        finalize=True, resizable=True, element_justification='c')
                added_status = "added"
@@ -174,7 +181,6 @@ class GUI:
                sys.exit()
 
 
-
    def inputAnswerPoll(self, layouts, value):
       while True:
          window = psg.Window("Q", layouts["input_front"],
@@ -183,15 +189,14 @@ class GUI:
          event1, values1 = window.read()
 
          if event1 == "Answer":
-            if self.card_handler.correctAnswer(value, values1[0]):
+            if self.deck_handler.correctAnswer(value, values1[0]):
                window.close()
                window = psg.Window("A", layouts["input_back"],
                                    finalize=True, resizable=True, element_justification='c')
                self.setWindowSize(window, 280, 220)
                time.sleep(8)
                window.close()
-               # return True / False to indicate if answered correctly? for use in Free View
-               return True
+               return "Correct"
             else:
                window.close()
                window = psg.Window("Q", layouts["incorrect"],
@@ -199,23 +204,25 @@ class GUI:
                self.setWindowSize(window, 640, 220)
                time.sleep(8)
                window.close()
-               # return True / False to indicate if answered correctly? for use in Free View
-               return False
+               return "Incorrect"
 
          elif event1 == "Return":
             window.close()
-            return False
+            return "Return"
          elif event1 == psg.WIN_CLOSED:
             sys.exit()
 
 
    def writeAudio(self, value):
-      self.voice_handler.writeTTSChineseFile(self.card_handler.getHanZi(value))
+      self.voice_handler.writeTTSChineseFile(self.deck_handler.getHanZi(value))
 
    def playAudio(self, audio_path):
       self.voice_handler.closeVLC()
       print("playing {}".format(audio_path))
       self.voice_handler.playWithVLC(audio_path)
+      # FIXME - opening instances for each play. If action a 
+      #         close then closes immediately before audio can play.
+      #         System sleep won't allow audio play.
       # time.sleep(10)
       # self.voice_handler.closeVLC()
 

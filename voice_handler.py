@@ -41,8 +41,8 @@ class VoiceHandler:
         if os.path.exists(path):
             # subprocess.Popen(["/Applications/VLC.app/Contents/MacOS/VLC", path])
 
-            # The os.setsid() is passed in the argument preexec_fn so
-            # it's run after the fork() and before  exec() to run the shell.
+            # os.setsid() is passed in preexec_fn so it's run 
+            # after the fork() and before exec() of shell command.
             self.vlc = subprocess.Popen(["/Applications/VLC.app/Contents/MacOS/VLC", path], 
                                    stdout=subprocess.PIPE, 
                                    shell=True,
@@ -58,8 +58,4 @@ class VoiceHandler:
             os.killpg(os.getpgid(self.vlc.pid), signal.SIGTERM)
         except:
             print("No VLC process to kill?..")
-
-
-
-        # TODO - close process (VLC) after playing
 
