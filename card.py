@@ -24,7 +24,8 @@ class Card:
       for val in self.chinese.split("/"):
          val = val.strip()
          for char in val:
-            if ord(char) >= 19968 and ord(char) <= 40959:
+            if ord(char) >= constants.UNICODE_CHINESE_LOWER_LIMIT\
+                 and ord(char) <= constants.UNICODE_CHINESE_UPPER_LIMIT:
                hanzi = hanzi + char
             else:
                pinyin = pinyin + char
