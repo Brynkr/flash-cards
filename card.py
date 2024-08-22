@@ -10,35 +10,29 @@ class Card:
       self.hanzi = ""
       self.setPinyinHanZi()
       self.checkPriority()
+      # self.checkCategories()
 
       # TODO
       # self.categories = []  [.., .., ..]
       # self.priority = False  (p)
       # self.mp3_location = ""  {.....}
 
-   #TODO -- change to unicode check?
+
    def setPinyinHanZi(self):
-      hanzi = None
-      pinyin = None
+      hanzi = ""
+      pinyin = ""
       for val in self.chinese.split("/"):
          val = val.strip()
-         word_len = len(val.split(" "))
-         if word_len == 2:
-            pinyin = val[:-1]
-            hanzi = val[-1:]
-         elif word_len == 3:
-            pinyin = val[:-2]
-            hanzi = val[-2:]
-         elif word_len == 4:
-            pinyin = val[:-3]
-            hanzi = val[-3:]
+         for char in val:
+            if ord(char) >= 19968 and ord(char) <= 40959:
+               hanzi = hanzi + char
+            else:
+               pinyin = pinyin + char
 
-         if hanzi != None:
-            self.hanzi = self.hanzi + hanzi.strip() + " "
-         if pinyin != None:
-            self.pinyin = self.pinyin + pinyin.strip() + " "
+         self.hanzi = self.hanzi + hanzi.strip() + " "
+         self.pinyin = self.pinyin + pinyin.strip() + " "
 
-      print("-- setPinyinHanZi --\nfull_hanzi={}\nfull_pinyin={}".format(self.hanzi, self.pinyin))
+      print("-- setPinyinHanZi --\nhanzi={}\npinyin={}".format(self.hanzi, self.pinyin))
 
 
    def checkPriority(self):
