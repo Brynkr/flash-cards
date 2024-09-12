@@ -2,26 +2,27 @@ import constants
 
 class Card:
 
-   def __init__(self, front, back, card_id):
+   def __init__(self, front, back, tags, card_id):
       self.id = card_id
+
+      self.tags = []
+      for tag in tags:
+         if tag != constants.CARD_PRIORITY_TAG:
+            self.tags.append(tag)
+
+      self.priority = constants.CARD_PRIORITY_TAG in tags
       self.english = front
       self.chinese = back
       self.pinyin = ""
       self.hanzi = ""
       self.setPinyinHanZi()
-      self.checkPriority()
-      # self.checkCategories()
-
-      # TODO
-      # self.categories = []  [.., .., ..]
-      # self.priority = False  (p)
-      # self.mp3_location = ""  {.....}
+      # TODO - self.mp3_location = ""  {.....}
 
 
    def setPinyinHanZi(self):
       hanzi = ""
       pinyin = ""
-      for val in self.chinese.split("/"):
+      for val in self.chinese.split(constants.WORD_DELIMITER):
          val = val.strip()
          for char in val:
             if ord(char) >= constants.UNICODE_CHINESE_LOWER_LIMIT\
@@ -36,17 +37,6 @@ class Card:
       print("-- setPinyinHanZi --\nhanzi={}\npinyin={}".format(self.hanzi, self.pinyin))
 
 
-   def checkPriority(self):
-      with open(constants.PRIORITY_CARD_DICT_PATH, 'r')\
-       as priority_cards:
-       for line in priority_cards:
-         if self.english in line:
-            self.priority = True
-            return
-
-      self.priority = False
-
-
    def getEnglish(self):
       return self.english
 
@@ -59,9 +49,8 @@ class Card:
    def getHanZi(self):
       return self.hanzi
 
-   # TODO
-   # def getCategories(self):
-   #    return self.categories
+   def getTags(self):
+      return self.tags
 
    def getID(self):
       return self.id

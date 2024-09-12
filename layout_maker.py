@@ -1,4 +1,6 @@
 import PySimpleGUI as psg
+import constants
+
 
 class LayoutMaker:
 
@@ -15,15 +17,18 @@ class LayoutMaker:
 
 
    def start(self):
-      start_layout = [ [psg.Button("Study", size=(12, 2)),
-                        psg.Button("Study Recent (100)", size=(12, 2)),
+      start_layout = [ [psg.VPush()],
+                       [psg.Button("Study", size=(12, 2)),
+                        psg.Button("Study Recent", size=(12, 2)),
                         psg.Button("Priority Study", size=(12, 2))],
                        [psg.Button("Input Study", size=(12, 2)),
                         psg.Button("Auto", size=(12, 2)),
                         psg.Button("Auto Priority", size=(12, 2))],
                        [psg.Button("Add Cards", size=(12, 2)),
-                        psg.Button("Fullscreen", size=(12, 2)),
-                        psg.Button("Exit", size=(12, 2))] ]
+                        psg.Button("Categories", size=(12, 2)),
+                        psg.Button("Fullscreen", size=(12, 2))],
+                        [psg.Button("Exit", size=(12, 2))],
+                        [psg.VPush()] ]
       return { "start" : start_layout }
 
 
@@ -108,6 +113,21 @@ class LayoutMaker:
       return { "add_cards_start" : add_cards_start_layout,
                "add_cards_back" : add_cards_back_layout,
                "invalid_syntax" : invalid_syntax_layout }
+
+
+   def categorySelect(self, categories):
+      print("Category select. categories={}".format(categories))
+      category_layout = [[psg.VPush()]]
+      
+      for category in categories.keys():
+         category_layout.append([psg.Checkbox(category.strip("[").strip("]"),
+                                default=categories[category], font=18)])
+
+      category_layout.append([psg.VPush()])
+      category_layout.append([psg.Button("Save and return", size=(8, 3))])
+      category_layout.append([psg.VPush()])
+      return { "category_select" : category_layout }
+
 
 
    # def column(self, col_len):

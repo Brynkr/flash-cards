@@ -1,4 +1,5 @@
 import random
+import constants
 from card import Card
 
 class Deck:
@@ -9,16 +10,17 @@ class Deck:
       self.cards_dict = {}
       self.priority_cards = []
       self.recent_cards = []
+      self.setCategories()
 
       for card in cards:         
          if card.isPriority():
             self.priority_cards.append(card)
 
-         if self.num_cards <= 100:
+         if self.num_cards <= constants.RECENT_CARDS_AMOUNT:
             if card.getID() >= self.num_cards - int(0.1 * self.num_cards):
                self.recent_cards.append(card)
          else:
-            if card.getID() >= self.num_cards - 100:
+            if card.getID() >= self.num_cards - constants.RECENT_CARDS_AMOUNT:
                self.recent_cards.append(card)
 
          self.cards_dict[card.getEnglish()] = card
@@ -68,7 +70,17 @@ class Deck:
       self.shuffle()
       self.shufflePriority()
       self.shuffleRecent()
-      
+
+
+   def setCategories(self):
+      self.categories = {constants.CATEGORY_ALL : True}
+      for card in self.cards:
+         for tag in card.getTags():
+            if tag not in self.categories:
+               self.categories[tag] = False
+
+      print("set categories={}".format(self.categories))
+
 
    def getCards(self):
       return self.cards
@@ -87,3 +99,6 @@ class Deck:
 
    def getNumberOfPriorityCards(self):
       return self.num_priority_cards
+
+   def getCategories(self):
+      return self.categories
