@@ -128,7 +128,3 @@ class LayoutMaker:
       category_layout.append([psg.VPush()])
       return { "category_select" : category_layout }
 
-
-
-   # def column(self, col_len):
-      # column = [[psg.Text("")] for i in range(col_len)]

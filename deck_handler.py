@@ -111,17 +111,17 @@ class DeckHandler:
       for card in cards:
          card_tags = card.getTags()
          
-         if categories[constants.CATEGORY_ALL] == True:
+         if categories[constants.CATEGORY_ALL]:
             filtered_cards.append(card)
             filtered_card_english.append(card.getEnglish())
 
-         elif not card_tags and categories[constants.CATEGORY_NO_TAGS] == True:
+         elif not card_tags and categories[constants.CATEGORY_NO_TAGS]:
             filtered_cards.append(card)
             filtered_card_english.append(card.getEnglish())
 
          else:
             for tag in card_tags:
-               if tag in categories.keys() and categories[tag] == True:
+               if tag in categories.keys() and categories[tag]:
                   filtered_cards.append(card)
                   filtered_card_english.append(card.getEnglish())
                   break

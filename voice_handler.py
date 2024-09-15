@@ -59,3 +59,25 @@ class VoiceHandler:
         except:
             print("No VLC process to kill?..")
 
+##########
+'''
+    def writeAudio(self, value):
+      self.voice_handler.writeTTSChineseFile(self.deck_handler.getHanZi(value))
+
+    def playAudio(self, audio_path):
+      self.voice_handler.closeVLC()
+      print("playing {}".format(audio_path))
+      self.voice_handler.playWithVLC(audio_path)
+      # FIXME - opening instances for each play. If action a 
+      #         close then closes immediately before audio can play.
+      #         System sleep won't allow audio play.
+      # time.sleep(10)
+      # self.voice_handler.closeVLC()
+
+    def writeAndPlayAudio(self, value, audio_path=constants.AUDIO_PATH):
+      print("Writing audio for: {}".format(value))
+      self.writeAudio(value)
+      self.playAudio(audio_path)
+'''
+
+

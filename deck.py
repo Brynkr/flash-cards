@@ -73,7 +73,7 @@ class Deck:
 
 
    def setCategories(self):
-      self.categories = {constants.CATEGORY_ALL : True}
+      self.categories = { constants.CATEGORY_ALL : True }
       for card in self.cards:
          for tag in card.getTags():
             if tag not in self.categories:

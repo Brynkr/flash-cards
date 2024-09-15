@@ -7,12 +7,7 @@ from layout_maker import LayoutMaker
 from voice_handler import VoiceHandler
 
 # TODO
-# Standardise windows
-# Window Manager class. Create all windows at startup, set sizes. Open/Close depending on mode in use
-
-# Categories : [___] [___]
-# -- category recognition
-
+# Window Manager class. Create and standardise all windows at startup. Open/Close depending on mode in use
 # --> Theme viewer, selector
 # sounds API? - pronounciation
 # automated Tests....
@@ -99,7 +94,6 @@ class GUI:
 
             event1, values1 = window.read()
             if event1 == "Answer":
-               ### FIXME - self.writeAndPlayAudio(value)
                window.close()
                window = psg.Window("A", layout_display["back"],
                                    finalize=True, resizable=True,
@@ -226,8 +220,6 @@ class GUI:
 
 
    def selectCategories(self):
-      # FIXME -- change to self.categories. only do deck getCategories once...
-      # categories = self.deck_handler.getCategories()
       layout = self.layout_maker.categorySelect(self.categories)
       window = psg.Window("Category Select", layout["category_select"],
                           finalize=True, resizable=True, element_justification='c')
@@ -249,28 +241,6 @@ class GUI:
          elif event == psg.WIN_CLOSED:
             window.close()
             return
-
-
-
-
-##############
-   def writeAudio(self, value):
-      self.voice_handler.writeTTSChineseFile(self.deck_handler.getHanZi(value))
-
-   def playAudio(self, audio_path):
-      self.voice_handler.closeVLC()
-      print("playing {}".format(audio_path))
-      self.voice_handler.playWithVLC(audio_path)
-      # FIXME - opening instances for each play. If action a 
-      #         close then closes immediately before audio can play.
-      #         System sleep won't allow audio play.
-      # time.sleep(10)
-      # self.voice_handler.closeVLC()
-
-   def writeAndPlayAudio(self, value, audio_path=constants.AUDIO_PATH):
-      print("Writing audio for: {}".format(value))
-      self.writeAudio(value)
-      self.playAudio(audio_path)
 
 
    def setWindowSize(self, window, default_x=520, default_y=380):
