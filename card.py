@@ -15,11 +15,11 @@ class Card:
       self.chinese = back
       self.pinyin = ""
       self.hanzi = ""
-      self.setPinyinHanZi()
+      self.set_pinyin_hanzi()
       # TODO - self.mp3_location = ""  {.....}
 
 
-   def setPinyinHanZi(self):
+   def set_pinyin_hanzi(self):
       hanzi = ""
       pinyin = ""
       for val in self.chinese.split(constants.WORD_DELIMITER):
@@ -34,26 +34,26 @@ class Card:
          self.hanzi = self.hanzi + hanzi.strip() + " "
          self.pinyin = self.pinyin + pinyin.strip() + " "
 
-      print("-- setPinyinHanZi --\nhanzi={}\npinyin={}".format(self.hanzi, self.pinyin))
+      print("-- set_pinyin_hanzi --\nhanzi={}\npinyin={}".format(self.hanzi, self.pinyin))
 
 
-   def getEnglish(self):
+   def get_english(self):
       return self.english
 
-   def getChinese(self):
+   def get_chinese(self):
       return self.chinese
 
-   def getPinyin(self):
+   def get_pinyin(self):
       return self.pinyin
 
-   def getHanZi(self):
+   def get_hanzi(self):
       return self.hanzi
 
-   def getTags(self):
+   def get_tags(self):
       return self.tags
 
-   def getID(self):
+   def get_id(self):
       return self.id
 
-   def isPriority(self):
+   def is_priority(self):
       return self.priority

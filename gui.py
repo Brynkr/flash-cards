@@ -19,78 +19,78 @@ class GUI:
       self.voice_handler = VoiceHandler()
 
       self.fullscreen = False
-      self.categories = self.deck_handler.getCategories()
+      self.categories = self.deck_handler.get_categories()
       self.categories[constants.CATEGORY_NO_TAGS] = False
 
       #TODO - default_window_size
       psg.theme(constants.GUI_THEME)
 
 
-   def toggleFullscreen(self, window):
+   def toggle_fullscreen(self, window):
       self.fullscreen = not self.fullscreen
       window.close()
 
 
-   def startMenu(self):
+   def start_menu(self):
       while True:
          layouts = self.layout_maker.start()
          window = psg.Window("Flash Cards", layouts["start"],
                              finalize=True, resizable=True, element_justification='c')
-         self.setWindowSize(window, 420, 300)
+         self.set_window_size(window, 420, 300)
 
-         self.deck_handler.shuffleDeck()
+         self.deck_handler.shuffle_deck()
 
          event, values = window.read()
          if event == "Study":
             window.close()
-            self.displayCards()
+            self.display_cards()
          elif event == "Study Recent (100)":
             window.close()
-            self.displayCards(recent=True)
+            self.display_cards(recent=True)
          elif event == "Priority Study":
             window.close()
-            self.displayCards(priority=True)
+            self.display_cards(priority=True)
          elif event == "Input Study":
             window.close()
-            self.inputStudy()
+            self.input_study()
          elif event == "Auto":
             window.close()
-            self.autoStudy()
+            self.auto_study()
          elif event == "Auto Priority":
             window.close()
-            self.autoStudy(priority=True)
+            self.auto_study(priority=True)
          elif event == "Add Cards":
             window.close()
-            self.addCards()
+            self.add_cards()
          elif event == "Categories":
             window.close()
-            self.selectCategories()
+            self.select_categories()
          elif event == "Fullscreen":
-            self.toggleFullscreen(window)
+            self.toggle_fullscreen(window)
             continue
          elif event == "Exit":
             sys.exit()
 
 
-   def displayCards(self, recent=False, priority=False):
+   def display_cards(self, recent=False, priority=False):
       if recent:
-         cards = self.deck_handler.categoryCardFilter(self.deck_handler.getRecentCards(),
+         cards = self.deck_handler.category_card_filter(self.deck_handler.get_recent_cards(),
                                                       self.categories)
       elif priority:
-         cards = self.deck_handler.categoryCardFilter(self.deck_handler.getPriorityCards(),
+         cards = self.deck_handler.category_card_filter(self.deck_handler.get_priority_cards(),
                                                       self.categories)
       else:
-         cards = self.deck_handler.categoryCardFilter(self.deck_handler.getCards(),
+         cards = self.deck_handler.category_card_filter(self.deck_handler.get_cards(),
                                                       self.categories)
 
       for card in cards:
-         print("front = {}, back = {}".format(card.getEnglish(), card.getChinese()))
-         layout_display = self.layout_maker.display(card.getEnglish(), card.getChinese(), priority)
+         print("front = {}, back = {}".format(card.get_english(), card.get_chinese()))
+         layout_display = self.layout_maker.display(card.get_english(), card.get_chinese(), priority)
 
          while True:
             window = psg.Window("Q", layout_display["front"], 
                                 finalize=True, resizable=True, element_justification='c')
-            self.setWindowSize(window, 520, 160)
+            self.set_window_size(window, 520, 160)
 
             event1, values1 = window.read()
             if event1 == "Answer":
@@ -98,14 +98,14 @@ class GUI:
                window = psg.Window("A", layout_display["back"],
                                    finalize=True, resizable=True,
                                    element_justification='c')
-               self.setWindowSize(window, 640, 210)
+               self.set_window_size(window, 640, 210)
                
                event2, values2 = window.read()
                if event2 == constants.BUTTON_NEXT_TEXT:
                   window.close()
                   break
                if event2 == constants.BUTTON_PRIORITY_TEXT:
-                  self.deck_handler.addPriorityCard(key, value)
+                  self.deck_handler.add_priority_card(key, value)
                   window.close()
                   break
                elif event2 == psg.WIN_CLOSED or event2 == constants.BUTTON_RETURN_TEXT:
@@ -123,41 +123,41 @@ class GUI:
       event_complete, values_complete = completed_window.read()
 
 
-   def inputStudy(self):
-      for card in self.deck_handler.categoryCardFilter(self.deck_handler.getCards(), self.categories):
-         print("front = {}, back = {}".format(card.getEnglish(), card.getChinese()))
-         layouts = self.layout_maker.input(card.getEnglish(), card.getChinese())
-         if self.inputAnswerPoll(layouts, card.getChinese()) == constants.BUTTON_RETURN_TEXT:
+   def input_study(self):
+      for card in self.deck_handler.category_card_filter(self.deck_handler.get_cards(), self.categories):
+         print("front = {}, back = {}".format(card.get_english(), card.get_chinese()))
+         layouts = self.layout_maker.input(card.get_english(), card.get_chinese())
+         if self.input_answer_poll(layouts, card.get_chinese()) == constants.BUTTON_RETURN_TEXT:
             return
 
       completed_window = self.layout_maker.completed()
       event_complete, values_complete = completed_window.read()
 
 
-   def autoStudy(self, priority=False):
+   def auto_study(self, priority=False):
       while True:
-         self.deck_handler.shuffleDeck()
+         self.deck_handler.shuffle_deck()
 
          if priority:
-            cards = self.deck_handler.categoryCardFilter(self.deck_handler.getPriorityCards(), self.categories)
+            cards = self.deck_handler.category_card_filter(self.deck_handler.get_priority_cards(), self.categories)
          else:
-            cards = self.deck_handler.categoryCardFilter(self.deck_handler.getCards(), self.categories)
+            cards = self.deck_handler.category_card_filter(self.deck_handler.get_cards(), self.categories)
 
          for card in cards:
-            print("front = {}, back = {}".format(card.getEnglish(), card.getChinese()))
-            auto_layout = self.layout_maker.auto(card.getEnglish(), card.getChinese())
+            print("front = {}, back = {}".format(card.get_english(), card.get_chinese()))
+            auto_layout = self.layout_maker.auto(card.get_english(), card.get_chinese())
             window = psg.Window("Q", auto_layout["auto"], location=(950, 700),
                                 finalize=True, resizable=True, element_justification='c')
-            self.setWindowSize(window, 320, 120)
+            self.set_window_size(window, 320, 120)
             time.sleep(constants.AUTO_DISPLAY_DELAY)
             window.close()
 
 
-   def addCards(self):
+   def add_cards(self):
       layouts = self.layout_maker.add()
       window = psg.Window("Add", layouts["add_cards_start"],
                           finalize=True, resizable=True, element_justification='c')
-      self.setWindowSize(window, 280, 100)
+      self.set_window_size(window, 280, 100)
       event, values = window.read()
       added_status = "start"
       while True:
@@ -166,7 +166,7 @@ class GUI:
             if values[0].find(constants.CARD_SIDE_DELIMITER) > 0:  # TODO, more syntax checking..
                if added_status != "start":
                   new_window.close()
-               self.deck_handler.addCards(values[0] + "\n")
+               self.deck_handler.add_cards(values[0] + "\n")
                new_window = psg.Window("Add", layouts["add_cards_back"],
                                        finalize=True, resizable=True, element_justification='c')
                added_status = "added"
@@ -187,19 +187,19 @@ class GUI:
                sys.exit()
 
 
-   def inputAnswerPoll(self, layouts, correct_value):
+   def input_answer_poll(self, layouts, correct_value):
       while True:
          window = psg.Window("Q", layouts["input_front"],
                              finalize=True, resizable=True, element_justification='c')
-         self.setWindowSize(window, 260, 150)
+         self.set_window_size(window, 260, 150)
          event, input_values = window.read()
 
          if event == "Answer":
-            if self.deck_handler.correctAnswer(correct_value, input_values[0]):
+            if self.deck_handler.correct_answer(correct_value, input_values[0]):
                window.close()
                window = psg.Window("A", layouts["input_back"],
                                    finalize=True, resizable=True, element_justification='c')
-               self.setWindowSize(window, 280, 220)
+               self.set_window_size(window, 280, 220)
                time.sleep(constants.ANSWER_DISPLAY_DELAY)
                window.close()
                return "Correct"
@@ -207,7 +207,7 @@ class GUI:
                window.close()
                window = psg.Window("Q", layouts["incorrect"],
                                    finalize=True, resizable=True, element_justification='c')
-               self.setWindowSize(window, 640, 220)
+               self.set_window_size(window, 640, 220)
                time.sleep(constants.ANSWER_DISPLAY_DELAY)
                window.close()
                return "Incorrect"
@@ -219,16 +219,16 @@ class GUI:
             sys.exit()
 
 
-   def selectCategories(self):
-      layout = self.layout_maker.categorySelect(self.categories)
+   def select_categories(self):
+      layout = self.layout_maker.category_select(self.categories)
       window = psg.Window("Category Select", layout["category_select"],
                           finalize=True, resizable=True, element_justification='c')
       window_y = 220 + 100 * len(self.categories)
-      self.setWindowSize(window, 280, window_y)
+      self.set_window_size(window, 280, window_y)
 
       while True:
          event, values = window.read()
-         print("selectCategories categories={}\nvalues={}".format(self.categories, values))
+         print("select_categories categories={}\nvalues={}".format(self.categories, values))
 
          if event == constants.BUTTON_SAVE_AND_RETURN_TEXT:
             for category in self.categories:
@@ -243,7 +243,7 @@ class GUI:
             return
 
 
-   def setWindowSize(self, window, default_x=520, default_y=380):
+   def set_window_size(self, window, default_x=520, default_y=380):
       if self.fullscreen:
          window.Maximize()
       else:

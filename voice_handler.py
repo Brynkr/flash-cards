@@ -16,7 +16,7 @@ class VoiceHandler:
         self.vlc = None
 
 
-    def writeTTSChineseFile(self, text_to_voice):
+    def write_tts_chinese_file(self, text_to_voice):
         data = { "text": text_to_voice,
                  "model_id": "eleven_multilingual_v2",
                  "voice_settings": { "stability": 0.5,
@@ -37,7 +37,7 @@ class VoiceHandler:
             return False
 
 
-    def playWithVLC(self, path):
+    def play_with_vlc(self, path):
         if os.path.exists(path):
             # subprocess.Popen(["/Applications/VLC.app/Contents/MacOS/VLC", path])
 
@@ -52,7 +52,7 @@ class VoiceHandler:
             print("path '{}' doesn't exist. Unable to play file.".format(path))
 
 
-    def closeVLC(self):
+    def close_vlc(self):
         try:
             print("Killing VLC process..")
             os.killpg(os.getpgid(self.vlc.pid), signal.SIGTERM)
@@ -61,23 +61,23 @@ class VoiceHandler:
 
 ##########
 '''
-    def writeAudio(self, value):
-      self.voice_handler.writeTTSChineseFile(self.deck_handler.getHanZi(value))
+    def write_audio(self, value):
+      self.voice_handler.write_tts_chinese_file(self.deck_handler.get_hanzi(value))
 
-    def playAudio(self, audio_path):
-      self.voice_handler.closeVLC()
+    def play_audio(self, audio_path):
+      self.voice_handler.close_vlc()
       print("playing {}".format(audio_path))
-      self.voice_handler.playWithVLC(audio_path)
+      self.voice_handler.play_with_vlc(audio_path)
       # FIXME - opening instances for each play. If action a 
       #         close then closes immediately before audio can play.
       #         System sleep won't allow audio play.
       # time.sleep(10)
-      # self.voice_handler.closeVLC()
+      # self.voice_handler.close_vlc()
 
-    def writeAndPlayAudio(self, value, audio_path=constants.AUDIO_PATH):
+    def write_and_play_audio(self, value, audio_path=constants.AUDIO_PATH):
       print("Writing audio for: {}".format(value))
-      self.writeAudio(value)
-      self.playAudio(audio_path)
+      self.write_audio(value)
+      self.play_audio(audio_path)
 '''
 
 

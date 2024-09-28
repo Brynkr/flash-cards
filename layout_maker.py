@@ -115,7 +115,7 @@ class LayoutMaker:
                "invalid_syntax" : invalid_syntax_layout }
 
 
-   def categorySelect(self, categories):
+   def category_select(self, categories):
       print("Category select. categories={}".format(categories))
       category_layout = [[psg.VPush()]]
       
