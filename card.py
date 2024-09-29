@@ -6,18 +6,18 @@ class Card:
    id_iter = itertools.count()
 
    def __init__(self, front, back, tags):
-      self.id = next(self.id_iter)
+      self._id = next(self.id_iter)
 
-      self.tags = []
+      self._tags = []
       for tag in tags:
          if tag != constants.CARD_PRIORITY_TAG:
-            self.tags.append(tag)
+            self._tags.append(tag)
 
-      self.priority = constants.CARD_PRIORITY_TAG in tags
-      self.english = front
-      self.chinese = back
-      self.pinyin = ""
-      self.hanzi = ""
+      self._priority = constants.CARD_PRIORITY_TAG in tags
+      self._english = front
+      self._chinese = back
+      self._pinyin = ""
+      self._hanzi = ""
       self.set_pinyin_hanzi()
       # TODO - self.mp3_location = ""  {.....}
 
@@ -25,7 +25,7 @@ class Card:
    def set_pinyin_hanzi(self):
       hanzi = ""
       pinyin = ""
-      for val in self.chinese.split(constants.WORD_DELIMITER):
+      for val in self._chinese.split(constants.WORD_DELIMITER):
          val = val.strip()
          for char in val:
             if ord(char) >= constants.UNICODE_CHINESE_LOWER_LIMIT\
@@ -34,29 +34,36 @@ class Card:
             else:
                pinyin = pinyin + char
 
-         self.hanzi = self.hanzi + hanzi.strip() + " "
-         self.pinyin = self.pinyin + pinyin.strip() + " "
+         self._hanzi = self._hanzi + hanzi.strip() + " "
+         self._pinyin = self._pinyin + pinyin.strip() + " "
 
-      print("-- set_pinyin_hanzi --\nhanzi={}\npinyin={}".format(self.hanzi, self.pinyin))
+      print("-- set_pinyin_hanzi --\nhanzi={}\npinyin={}".format(self._hanzi, self._pinyin))
 
 
-   def get_english(self):
-      return self.english
+   @property
+   def english(self):
+      return self._english
 
-   def get_chinese(self):
-      return self.chinese
+   @property
+   def chinese(self):
+      return self._chinese
 
-   def get_pinyin(self):
-      return self.pinyin
+   @property
+   def pinyin(self):
+      return self._pinyin
 
-   def get_hanzi(self):
-      return self.hanzi
+   @property
+   def hanzi(self):
+      return self._hanzi
 
-   def get_tags(self):
-      return self.tags
+   @property
+   def tags(self):
+      return self._tags
 
-   def get_id(self):
-      return self.id
+   @property
+   def id(self):
+      return self._id
 
-   def is_priority(self):
-      return self.priority
+   @property
+   def priority(self):
+      return self._priority

@@ -62,17 +62,17 @@ class VoiceHandler:
 ##########
 '''
     def write_audio(self, value):
-      self.voice_handler.write_tts_chinese_file(self.deck_handler.get_hanzi(value))
+      self._voice_handler.write_tts_chinese_file(self._deck_handler.get_hanzi(value))
 
     def play_audio(self, audio_path):
-      self.voice_handler.close_vlc()
+      self._voice_handler.close_vlc()
       print("playing {}".format(audio_path))
-      self.voice_handler.play_with_vlc(audio_path)
+      self._voice_handler.play_with_vlc(audio_path)
       # FIXME - opening instances for each play. If action a 
       #         close then closes immediately before audio can play.
       #         System sleep won't allow audio play.
       # time.sleep(10)
-      # self.voice_handler.close_vlc()
+      # self._voice_handler.close_vlc()
 
     def write_and_play_audio(self, value, audio_path=constants.AUDIO_PATH):
       print("Writing audio for: {}".format(value))

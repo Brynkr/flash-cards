@@ -9,35 +9,40 @@ class DeckHandler:
    def __init__(self,
                 card_dir=constants.CARD_DICT_PATH,
                 priority_card_dir=constants.PRIORITY_CARD_DICT_PATH):
-      self.card_dir = card_dir
-      self.priority_card_dir = priority_card_dir
+      self._card_dir = card_dir
+      self._priority_card_dir = priority_card_dir
 
-      self.deck = None
+      self._deck = None
       self.build_deck(card_dir)
-      self.deck.shuffle_all()
+      self._deck.shuffle_all()
 
 
    def shuffle_deck(self):
-      self.deck.shuffle_all()
+      self._deck.shuffle_all()
 
-   def get_cards(self):
-      return self.deck.get_cards()
+   @property
+   def cards(self):
+      return self._deck.cards
 
-   def get_cards_dict(self):
-      return self.deck.get_cards_dict()
+   @property
+   def cards_dict(self):
+      return self._deck.cards_dict
 
-   def get_priority_cards(self):
-      return self.deck.get_priority_cards()
+   @property
+   def priority_cards(self):
+      return self._deck.priority_cards
 
-   def get_recent_cards(self):
-      return self.deck.get_recent_cards()
+   @property
+   def recent_cards(self):
+      return self._deck.recent_cards
 
-   def get_categories(self):
-      return self.deck.get_categories()
+   @property
+   def categories(self):
+      return self._deck.categories
 
 
    def add_cards(self, card):
-      with open(self.card_dir, 'a') as file:
+      with open(self._card_dir, 'a') as file:
          print("writing card: {}".format(card))
          file.write(card)
       return
@@ -61,18 +66,18 @@ class DeckHandler:
 
                card_list.append(Card(front, back, tags))
 
-      self.deck = Deck(card_list)
+      self._deck = Deck(card_list)
 
 
    def add_priority_card(self, side_one, side_two):
-      with open(self.priority_card_dir, 'r') as cards:
+      with open(self._priority_card_dir, 'r') as cards:
          for line in cards:
             line_list = line.split(constants.CARD_SIDE_DELIMITER)
             if line_list[constants.ENGLISH_INDEX].strip() == side_one\
              and line_list[constants.CHINESE_INDEX].strip() == side_two:
                print("Priority card already exists, skipping.\n")
                return
-      with open(self.priority_card_dir, 'a') as file:
+      with open(self._priority_card_dir, 'a') as file:
          file.write("\n{} {} {}".format(side_one, constants.CARD_SIDE_DELIMITER, side_two))
          print("Added priority card.\n")
 
@@ -98,8 +103,8 @@ class DeckHandler:
 
 
    def get_hanzi(self, value):
-      cards = self.deck.get_cards_dict()
-      return cards[value].get_hanzi()
+      cards = self._deck.cards_dict
+      return cards[value].hanzi
 
 
    def category_card_filter(self, cards, categories):
@@ -107,21 +112,21 @@ class DeckHandler:
       filtered_cards = []
       filtered_card_english = []
       for card in cards:
-         card_tags = card.get_tags()
+         card_tags = card.tags
          
          if categories[constants.CATEGORY_ALL]:
             filtered_cards.append(card)
-            filtered_card_english.append(card.get_english())
+            filtered_card_english.append(card.english)
 
          elif not card_tags and categories[constants.CATEGORY_NO_TAGS]:
             filtered_cards.append(card)
-            filtered_card_english.append(card.get_english())
+            filtered_card_english.append(card.english)
 
          else:
             for tag in card_tags:
                if tag in categories.keys() and categories[tag]:
                   filtered_cards.append(card)
-                  filtered_card_english.append(card.get_english())
+                  filtered_card_english.append(card.english)
                   break
 
       print("len cards used={} filtered_cards={}".format(len(filtered_card_english), filtered_card_english))

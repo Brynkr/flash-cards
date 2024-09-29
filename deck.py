@@ -5,39 +5,39 @@ from card import Card
 class Deck:
 
    def __init__(self, cards):
-      self.cards = cards
-      self.num_cards = len(cards)
-      self.cards_dict = {}
-      self.priority_cards = []
-      self.recent_cards = []
+      self._cards = cards
+      self._num_cards = len(cards)
+      self._cards_dict = {}
+      self._priority_cards = []
+      self._recent_cards = []
       self.set_categories()
 
       for card in cards:         
-         if card.is_priority():
-            self.priority_cards.append(card)
+         if card.priority:
+            self._priority_cards.append(card)
 
-         if self.num_cards <= constants.RECENT_CARDS_AMOUNT:
-            if card.get_id() >= self.num_cards - int(0.1 * self.num_cards):
-               self.recent_cards.append(card)
+         if self._num_cards <= constants.RECENT_CARDS_AMOUNT:
+            if card.id >= self._num_cards - int(0.1 * self._num_cards):
+               self._recent_cards.append(card)
          else:
-            if card.get_id() >= self.num_cards - constants.RECENT_CARDS_AMOUNT:
-               self.recent_cards.append(card)
+            if card.id >= self._num_cards - constants.RECENT_CARDS_AMOUNT:
+               self._recent_cards.append(card)
 
-         self.cards_dict[card.get_english()] = card
+         self._cards_dict[card.english] = card
 
-      self.num_priority_cards = len(self.priority_cards)
+      self._num_priority_cards = len(self._priority_cards)
 
 
    def shuffle(self):
       shuffled_cards = []
       already_rolled = []
-      while len(shuffled_cards) < self.num_cards:
-         index = random.randint(0, self.num_cards - 1)
+      while len(shuffled_cards) < self._num_cards:
+         index = random.randint(0, self._num_cards - 1)
          if index not in already_rolled:
-            shuffled_cards.append(self.cards[index])
+            shuffled_cards.append(self._cards[index])
             already_rolled.append(index)
 
-      self.cards = shuffled_cards
+      self._cards = shuffled_cards
 
 
    def shuffle_priority(self):
@@ -47,23 +47,23 @@ class Deck:
       while len(shuffled_cards) < num_cards:
          index = random.randint(0, num_cards - 1)
          if index not in already_rolled:
-            shuffled_cards.append(self.priority_cards[index])
+            shuffled_cards.append(self._priority_cards[index])
             already_rolled.append(index)
 
-      self.priority_cards = shuffled_cards
+      self._priority_cards = shuffled_cards
 
 
    def shuffle_recent(self):
       shuffled_cards = []
       already_rolled = []
-      num_cards = len(self.recent_cards)
+      num_cards = len(self._recent_cards)
       while len(shuffled_cards) < num_cards:
          index = random.randint(0, num_cards - 1)
          if index not in already_rolled:
-            shuffled_cards.append(self.recent_cards[index])
+            shuffled_cards.append(self._recent_cards[index])
             already_rolled.append(index)
 
-      self.recent_cards = shuffled_cards
+      self._recent_cards = shuffled_cards
 
 
    def shuffle_all(self):
@@ -73,32 +73,39 @@ class Deck:
 
 
    def set_categories(self):
-      self.categories = { constants.CATEGORY_ALL : True }
-      for card in self.cards:
-         for tag in card.get_tags():
-            if tag not in self.categories:
-               self.categories[tag] = False
+      self._categories = { constants.CATEGORY_ALL : True }
+      for card in self._cards:
+         for tag in card.tags:
+            if tag not in self._categories:
+               self._categories[tag] = False
                
-      print("set categories={}".format(self.categories))
+      print("set categories={}".format(self._categories))
 
 
-   def get_cards(self):
-      return self.cards
+   @property
+   def cards(self):
+      return self._cards
 
-   def get_cards_dict(self):
-      return self.cards_dict
+   @property
+   def cards_dict(self):
+      return self._cards_dict
 
-   def get_priority_cards(self):
-      return self.priority_cards
+   @property
+   def priority_cards(self):
+      return self._priority_cards
 
-   def get_recent_cards(self):
-      return self.recent_cards
+   @property
+   def recent_cards(self):
+      return self._recent_cards
 
-   def get_number_of_cards(self):
-      return self.num_cards
+   @property
+   def number_of_cards(self):
+      return self._num_cards
 
-   def get_number_of_priority_cards(self):
-      return self.num_priority_cards
+   @property
+   def number_of_priority_cards(self):
+      return self._num_priority_cards
 
-   def get_categories(self):
-      return self.categories
+   @property
+   def categories(self):
+      return self._categories
