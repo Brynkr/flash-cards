@@ -45,7 +45,6 @@ class DeckHandler:
 
    def build_deck(self, card_dir):
       card_list = []
-      card_id = 0
       with open(card_dir, 'r') as cards:
          for line in cards:
             print("\nBuilding Deck. Line = {}".format(line))
@@ -60,8 +59,7 @@ class DeckHandler:
                   for tag in split_line[constants.TAG_INDEX].strip().split(" "):
                      tags.append(tag.strip("[").strip("]"))
 
-               card_list.append(Card(front, back, tags, card_id))
-               card_id = card_id + 1
+               card_list.append(Card(front, back, tags))
 
       self.deck = Deck(card_list)
 

@@ -1,9 +1,12 @@
+import itertools
 import constants
 
 class Card:
 
-   def __init__(self, front, back, tags, card_id):
-      self.id = card_id
+   id_iter = itertools.count()
+
+   def __init__(self, front, back, tags):
+      self.id = next(self.id_iter)
 
       self.tags = []
       for tag in tags:
