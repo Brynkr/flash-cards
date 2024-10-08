@@ -16,8 +16,10 @@ class LayoutMaker:
       return { "completed" : completed_layout }
 
 
-   def start(self):
+   def start(self, card_count):
       start_layout = [ [psg.VPush()],
+                       [psg.Text("Cards: {}".format(card_count), text_color='yellow', font=("Arial", 18))],
+                       [psg.VPush()],
                        [psg.Button("Study", size=(12, 2)),
                         psg.Button("Study Recent", size=(12, 2)),
                         psg.Button("Priority Study", size=(12, 2))],
@@ -41,12 +43,12 @@ class LayoutMaker:
                        [psg.VPush()] ]
       if priority:
          back_layout = [ [psg.VPush()],
-                               [psg.Text(str(key) + ':', font='Any 28')],
-                               [psg.Text(str(value), font='Any 28', text_color='yellow')],
-                               [psg.Text("")],
-                               [psg.Button("Next", focus=True, bind_return_key=True, size=(46, 4)),
-                                psg.Button("Return", size=(22, 4))],
-                               [psg.VPush()] ]
+                         [psg.Text(str(key) + ':', font='Any 28')],
+                         [psg.Text(str(value), font='Any 28', text_color='yellow')],
+                         [psg.Text("")],
+                         [psg.Button("Next", focus=True, bind_return_key=True, size=(46, 4)),
+                          psg.Button("Return", size=(22, 4))],
+                         [psg.VPush()] ]
       else:
          back_layout = [ [psg.VPush()],
                          [psg.Text(str(key) + ':', font='Any 28')],

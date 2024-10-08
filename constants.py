@@ -1,6 +1,5 @@
-CARD_DICT_PATH = "./cards.txt"
-PRIORITY_CARD_DICT_PATH = "./priority_cards.txt"
-TEST_CARD_DICT_PATH = "./test_cards.txt"
+CARD_DICT_PATH = "/Users/bryn/Documents/PyProjects/flashcards/cards.txt"
+PRIORITY_CARD_DICT_PATH = "/Users/bryn/Documents/PyProjects/flashcards/priority_cards.txt"
 GUI_THEME = "DarkTeal2"
 ENGLISH_INDEX = 0
 CHINESE_INDEX = 1

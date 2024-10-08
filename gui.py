@@ -39,10 +39,10 @@ class GUI:
    # FIXME -- if deck is empty, exit out or raise error....
    def start_menu(self):
       while True:
-         layouts = self._layout_maker.start()
+         layouts = self._layout_maker.start(len(self._deck_handler.cards))
          window = psg.Window("Flash Cards", layouts["start"],
                              finalize=True, resizable=True, element_justification='c')
-         self.set_window_size(window, 420, 300)
+         self.set_window_size(window, 420, 350)
 
          self._deck_handler.shuffle_deck()
 
@@ -74,7 +74,7 @@ class GUI:
          elif event == "Fullscreen":
             self.toggle_fullscreen(window)
             continue
-         elif event == "Exit":
+         elif event == "Exit" or event == psg.WIN_CLOSED:
             sys.exit()
 
 
