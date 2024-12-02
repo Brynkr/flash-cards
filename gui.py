@@ -14,9 +14,6 @@ from voice_handler import VoiceHandler
 # specify auto timer duration
 
 
-#FIXME -- empty deck of cards stalls. Need an exit for this.
-
-
 class GUI:
    def __init__(self):
       self._deck_handler = DeckHandler()
@@ -36,17 +33,21 @@ class GUI:
       window.close()
 
 
-   # FIXME -- if deck is empty, exit out or raise error....
    def start_menu(self):
       while True:
          layouts = self._layout_maker.start(len(self._deck_handler.cards))
          window = psg.Window("Flash Cards", layouts["start"],
                              finalize=True, resizable=True, element_justification='c')
          self.set_window_size(window, 420, 350)
-
          self._deck_handler.shuffle_deck()
 
          event, values = window.read()
+
+         if not self._deck_handler.cards:
+            if event != "Add Cards" and event != "Fullscreen":
+               print("No cards in the deck! Can't continue until cards are added.")
+               sys.exit()
+
          if event == "Study":
             window.close()
             self.display_cards()
