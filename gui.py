@@ -9,10 +9,10 @@ from voice_handler import VoiceHandler
 # TODO
 # Window Manager class. Create and standardise all windows at startup. Open/Close depending on mode in use
 # --> Theme viewer, selector
-# sounds API? - pronounciation
-# automated Tests....
+# automated tests....
 # specify auto timer duration
 
+# FIXME - refactor to main.py? separate some functions out of GUI class
 
 class GUI:
    def __init__(self):
@@ -26,11 +26,6 @@ class GUI:
 
       #TODO - default_window_size
       psg.theme(constants.GUI_THEME)
-
-
-   def toggle_fullscreen(self, window):
-      self._fullscreen = not self._fullscreen
-      window.close()
 
 
    def start_menu(self):
@@ -75,6 +70,9 @@ class GUI:
          elif event == "Fullscreen":
             self.toggle_fullscreen(window)
             continue
+         elif event == "Generate Audio":
+            #TODO - progress bar popup for generating
+            self.generate_audio(self._deck_handler.deck)
          elif event == "Exit" or event == psg.WIN_CLOSED:
             sys.exit()
 
@@ -106,6 +104,8 @@ class GUI:
                                    finalize=True, resizable=True,
                                    element_justification='c')
                self.set_window_size(window, 640, 210)
+
+               self._voice_handler.play_audio_file(card.english)
                
                event2, values2 = window.read()
                if event2 == constants.BUTTON_NEXT_TEXT:
@@ -134,7 +134,7 @@ class GUI:
       for card in self._deck_handler.category_card_filter(self._deck_handler.cards, self._categories):
          print("front = {}, back = {}".format(card.english, card.chinese))
          layouts = self._layout_maker.input(card.english, card.chinese)
-         if self.input_answer_poll(layouts, card.chinese) == constants.BUTTON_RETURN_TEXT:
+         if self.input_answer_poll(layouts, card) == constants.BUTTON_RETURN_TEXT:
             return
 
       completed_window = self._layout_maker.completed()
@@ -156,6 +156,9 @@ class GUI:
             window = psg.Window("Q", auto_layout["auto"], location=(950, 700),
                                 finalize=True, resizable=True, element_justification='c')
             self.set_window_size(window, 320, 120)
+
+            self._voice_handler.play_audio_file(card.english)
+
             time.sleep(constants.AUTO_DISPLAY_DELAY)
             window.close()
 
@@ -194,7 +197,7 @@ class GUI:
                sys.exit()
 
 
-   def input_answer_poll(self, layouts, correct_value):
+   def input_answer_poll(self, layouts, card):
       while True:
          window = psg.Window("Q", layouts["input_front"],
                              finalize=True, resizable=True, element_justification='c')
@@ -202,11 +205,12 @@ class GUI:
          event, input_values = window.read()
 
          if event == "Answer":
-            if self._deck_handler.correct_answer(correct_value, input_values[0]):
+            if self._deck_handler.correct_answer(card.chinese, input_values[0]):
                window.close()
                window = psg.Window("A", layouts["input_back"],
                                    finalize=True, resizable=True, element_justification='c')
                self.set_window_size(window, 280, 220)
+               self._voice_handler.play_audio_file(card.english)
                time.sleep(constants.ANSWER_DISPLAY_DELAY)
                window.close()
                return "Correct"
@@ -255,4 +259,19 @@ class GUI:
          window.Maximize()
       else:
          window.set_size(size=(default_x, default_y))
+
+
+   def toggle_fullscreen(self, window):
+      self._fullscreen = not self._fullscreen
+      window.close()
+
+
+   def generate_audio(self, deck):
+      # TODO - create progress bar update loop
+      layout = self._layout_maker.generating_audio(len(deck.cards))
+      window = psg.Window("Generating Audio", layout["generating_audio"],
+                          finalize=True, resizable=True, element_justification='c')
+      self.set_window_size(window, 480, 120)
+      self._voice_handler.generate_audio_files(deck)
+      window.close()
 

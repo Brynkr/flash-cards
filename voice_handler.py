@@ -1,3 +1,9 @@
+from pyht import Client
+from pyht.client import TTSOptions
+from pyht.client import Language
+
+import vlc
+
 import requests
 import json
 import os
@@ -8,76 +14,59 @@ import simpleaudio
 import constants
 
 
+#TODO - progress bar when generating audio files
+#     - english language also generated for the card
+
+def is_alphabet_char(char):
+    if ord(char) <= constants.UNICODE_ALPHABET_LOWERCASE_END and ord(char) >= constants.UNICODE_ALPHABET_LOWERCASE_START:
+        return True
+    if ord(char) <= constants.UNICODE_ALPHABET_UPPERCASE_END and ord(char) >= constants.UNICODE_ALPHABET_UPPERCASE_START:
+        return True
+
+    return False
+
+
 class VoiceHandler:
     def __init__(self):
-        self.tts_url = f"https://api.elevenlabs.io/v1/text-to-speech/{constants.ELEVEN_CHINESE_VOICE_ID}/stream"
-        self.headers = { "Accept": "application/json",
-                         "xi-api-key": constants.ELEVEN_API_KEY }
-        self.vlc = None
+        self._pyht_client = Client(user_id=constants.PLAYHT_USER_ID,
+                                   api_key=constants.PLAYHT_API_KEY)
+
+        self._pyht_options = TTSOptions(voice=constants.PLAYHT_VOICE,
+                                        language=Language("mandarin"),
+                                        speed=0.6)
 
 
-    def write_tts_chinese_file(self, text_to_voice):
-        data = { "text": text_to_voice,
-                 "model_id": "eleven_multilingual_v2",
-                 "voice_settings": { "stability": 0.5,
-                                     "similarity_boost": 0.8,
-                                     "style": 0.0,
-                                     "use_speaker_boost": True } }
-
-        # Make the POST request to the TTS API with headers and data, enabling streaming response
-        response = requests.post(self.tts_url, headers=self.headers, json=data, stream=True)
-        if response.ok:
-            with open("./output.mp3", "wb") as f:
-                for chunk in response.iter_content(chunk_size=1024):
-                    f.write(chunk)
-            print("Audio stream saved successfully.")
-            return True
-        else:
-            print(response.text)
-            return False
+    #TODO wrapper function that services the GUI progress bar
+    def play_audio_file(self, card_english):
+        audio_name = self.parse_audio_filename(card_english)
+        for filename in os.listdir(constants.AUDIO_PATH):
+            if filename == audio_name:
+                p = vlc.MediaPlayer(constants.AUDIO_PATH + "/" + filename)
+                p.play()
+                return
+        print("Couldn't find an audio file for filename: {}".format(audio_name))
 
 
-    def play_with_vlc(self, path):
-        if os.path.exists(path):
-            # subprocess.Popen(["/Applications/VLC.app/Contents/MacOS/VLC", path])
-
-            # os.setsid() is passed in preexec_fn so it's run 
-            # after the fork() and before exec() of shell command.
-            self.vlc = subprocess.Popen(["/Applications/VLC.app/Contents/MacOS/VLC", path], 
-                                   stdout=subprocess.PIPE, 
-                                   shell=True,
-                                   preexec_fn=os.setsid)
-            print("Opened and playing with VLC file: '{}'".format(path))
-        else:
-            print("path '{}' doesn't exist. Unable to play file.".format(path))
+    def parse_audio_filename(self, card_english):
+        filename = card_english
+        for char in filename:
+            if not is_alphabet_char(char):
+                print("replacing char: {} with _".format(char))
+                filename = filename.replace(char, "_")
+        return filename + ".mp3"
 
 
-    def close_vlc(self):
-        try:
-            print("Killing VLC process..")
-            os.killpg(os.getpgid(self.vlc.pid), signal.SIGTERM)
-        except:
-            print("No VLC process to kill?..")
+    def playht_write_tts_chinese_file(self, text_to_voice, filename):
+        print("Writing PlayHT TTS Chinese file - ttv: {} filename: {}".format(text_to_voice, filename))
+        with open(filename, "wb") as audio_file:
+            for chunk in self._pyht_client.tts(text_to_voice, self._pyht_options, voice_engine=constants.PLAYHT_VOICE_ENGINE):
+                audio_file.write(chunk)
+        print("Audio saved as {}".format(filename))
 
-##########
-'''
-    def write_audio(self, value):
-      self._voice_handler.write_tts_chinese_file(self._deck_handler.get_hanzi(value))
 
-    def play_audio(self, audio_path):
-      self._voice_handler.close_vlc()
-      print("playing {}".format(audio_path))
-      self._voice_handler.play_with_vlc(audio_path)
-      # FIXME - opening instances for each play. If action a 
-      #         close then closes immediately before audio can play.
-      #         System sleep won't allow audio play.
-      # time.sleep(10)
-      # self._voice_handler.close_vlc()
-
-    def write_and_play_audio(self, value, audio_path=constants.AUDIO_PATH):
-      print("Writing audio for: {}".format(value))
-      self.write_audio(value)
-      self.play_audio(audio_path)
-'''
+    def generate_audio_files(self, deck):
+        for card in deck.cards:
+            filename = self.parse_audio_filename(card.english)
+            self.playht_write_tts_chinese_file(card.hanzi, "{0}{1}.mp3".format(constants.AUDIO_PATH, filename))
 
 

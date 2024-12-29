@@ -1,5 +1,7 @@
-CARD_DICT_PATH = "/Users/bryn/Documents/PyProjects/flashcards/cards.txt"
-PRIORITY_CARD_DICT_PATH = "/Users/bryn/Documents/PyProjects/flashcards/priority_cards.txt"
+CARD_PATH = "/Users/bryn/Documents/PyProjects/flashcards/cards.txt"
+PRIORITY_CARD_PATH = "/Users/bryn/Documents/PyProjects/flashcards/priority_cards.txt"
+AUDIO_PATH = "/Users/bryn/Documents/PyProjects/flashcards/audio/"
+
 GUI_THEME = "DarkTeal2"
 ENGLISH_INDEX = 0
 CHINESE_INDEX = 1
@@ -8,6 +10,7 @@ WORD_LEN_LIM = 30
 ANSWER_DISPLAY_DELAY = 8
 AUTO_DISPLAY_DELAY = 10
 RECENT_CARDS_AMOUNT = 100
+
 COMMENTED_LINE_CHAR = "#"
 CARD_SIDE_DELIMITER = ":"
 WORD_DELIMITER = "/"
@@ -19,9 +22,16 @@ BUTTON_SAVE_AND_RETURN_TEXT = "Save and return"
 CARD_PRIORITY_TAG = "p"
 CATEGORY_NO_TAGS = "The rest"
 CATEGORY_ALL = "All"
+
 UNICODE_CHINESE_LOWER_LIMIT = 19968
 UNICODE_CHINESE_UPPER_LIMIT = 40959
-ELEVEN_API_KEY = "sk_7c2dc4e759192fe01c07fd0d290d3e45ae126e8056ec838e"
-ELEVEN_CHINESE_VOICE_ID = "hmD4OXeLrQIVXXUdliAG"
-ELEVEN_API_URL = "https://api.elevenlabs.io/v1/text-to-speech/" + ELEVEN_CHINESE_VOICE_ID
-AUDIO_PATH = "/Users/bryn/Documents/PyProjects/flashcards/output.mp3"
+UNICODE_ALPHABET_LOWERCASE_START = 97
+UNICODE_ALPHABET_LOWERCASE_END = 122
+UNICODE_ALPHABET_UPPERCASE_START = 65
+UNICODE_ALPHABET_UPPERCASE_END = 90
+
+PLAYHT_USER_ID = "8HjSepUDWIa1FBQO6SEwuUryUlL2"
+PLAYHT_API_KEY = "fde0d22bd65449ed9a46bd340fc46710"
+PLAYHT_API_URL = "https://api.play.ht/api/v2/tts/stream"
+PLAYHT_VOICE = "s3://voice-cloning-zero-shot/0de4c615-277c-43dd-b624-cae756d44582/cn-voice1/manifest.json"
+PLAYHT_VOICE_ENGINE="Play3.0-mini-http"

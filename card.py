@@ -2,7 +2,6 @@ import itertools
 import constants
 
 class Card:
-
    id_iter = itertools.count()
 
    def __init__(self, front, back, tags):
@@ -19,7 +18,6 @@ class Card:
       self._pinyin = ""
       self._hanzi = ""
       self.set_pinyin_hanzi()
-      # TODO - self.mp3_location = ""  {.....}
 
 
    def set_pinyin_hanzi(self):
