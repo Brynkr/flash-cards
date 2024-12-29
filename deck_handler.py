@@ -7,8 +7,8 @@ from deck import Deck
 class DeckHandler:
 
    def __init__(self,
-                card_dir=constants.CARD_DICT_PATH,
-                priority_card_dir=constants.PRIORITY_CARD_DICT_PATH):
+                card_dir=constants.CARD_PATH,
+                priority_card_dir=constants.PRIORITY_CARD_PATH):
       self._card_dir = card_dir
       self._priority_card_dir = priority_card_dir
 
@@ -19,6 +19,10 @@ class DeckHandler:
 
    def shuffle_deck(self):
       self._deck.shuffle_all()
+
+   @property
+   def deck(self):
+      return self._deck
 
    @property
    def cards(self):

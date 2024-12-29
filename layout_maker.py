@@ -19,18 +19,24 @@ class LayoutMaker:
    def start(self, card_count):
       start_layout = [ [psg.VPush()],
                        [psg.Text("Cards: {}".format(card_count), text_color='yellow', font=("Arial", 18))],
+                       
                        [psg.VPush()],
                        [psg.Button("Study", size=(12, 2)),
                         psg.Button("Study Recent", size=(12, 2)),
                         psg.Button("Priority Study", size=(12, 2))],
+
                        [psg.Button("Input Study", size=(12, 2)),
                         psg.Button("Auto", size=(12, 2)),
                         psg.Button("Auto Priority", size=(12, 2))],
+
                        [psg.Button("Add Cards", size=(12, 2)),
                         psg.Button("Categories", size=(12, 2)),
                         psg.Button("Fullscreen", size=(12, 2))],
-                        [psg.Button("Exit", size=(12, 2))],
-                        [psg.VPush()] ]
+
+                       [psg.Button("Generate Audio", size=(12, 2)),
+                        psg.Button("Exit", size=(12, 2))],
+                       [psg.VPush()] ]
+
       return { "start" : start_layout }
 
 
@@ -130,3 +136,7 @@ class LayoutMaker:
       category_layout.append([psg.VPush()])
       return { "category_select" : category_layout }
 
+
+   def generating_audio(self, card_count):
+      generating_audio_layout = [ [psg.Text("Generating Audio for {} cards.. Will take a while.".format(card_count))] ]
+      return { "generating_audio" : generating_audio_layout }
