@@ -4,6 +4,8 @@ from pyht.client import Language
 
 import vlc
 
+import PySimpleGUI
+
 import requests
 import json
 import os
@@ -14,8 +16,7 @@ import simpleaudio
 import constants
 
 
-#TODO - progress bar when generating audio files
-#     - english language also generated for the card
+#TODO - english language also generated for the card
 
 def is_alphabet_char(char):
     if ord(char) <= constants.UNICODE_ALPHABET_LOWERCASE_END and ord(char) >= constants.UNICODE_ALPHABET_LOWERCASE_START:
@@ -36,7 +37,6 @@ class VoiceHandler:
                                         speed=0.6)
 
 
-    #TODO wrapper function that services the GUI progress bar
     def play_audio_file(self, card_english):
         audio_name = self.parse_audio_filename(card_english)
         for filename in os.listdir(constants.AUDIO_PATH):
@@ -64,9 +64,14 @@ class VoiceHandler:
         print("Audio saved as {}".format(filename))
 
 
-    def generate_audio_files(self, deck):
+    def generate_audio_files(self, deck, window):
+        generated_count = 0
+        card_count = len(deck.cards)
         for card in deck.cards:
             filename = self.parse_audio_filename(card.english)
             self.playht_write_tts_chinese_file(card.hanzi, "{0}{1}.mp3".format(constants.AUDIO_PATH, filename))
+            generated_count += 1
+            window["GEN-AUDIO"].update(current_count=generated_count)
+            window["GEN-AUDIO-TEXT"].update(value="Generating audio {}/{}".format(generated_count, card_count))
 
 
