@@ -267,11 +267,10 @@ class GUI:
 
 
    def generate_audio(self, deck):
-      # TODO - create progress bar update loop
       layout = self._layout_maker.generating_audio(len(deck.cards))
       window = psg.Window("Generating Audio", layout["generating_audio"],
                           finalize=True, resizable=True, element_justification='c')
       self.set_window_size(window, 480, 120)
-      self._voice_handler.generate_audio_files(deck)
+      self._voice_handler.generate_audio_files(deck, window)
       window.close()
 

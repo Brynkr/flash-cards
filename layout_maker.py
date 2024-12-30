@@ -138,5 +138,6 @@ class LayoutMaker:
 
 
    def generating_audio(self, card_count):
-      generating_audio_layout = [ [psg.Text("Generating Audio for {} cards.. Will take a while.".format(card_count))] ]
+      generating_audio_layout = [ [psg.ProgressBar(card_count, key="GEN-AUDIO")],
+                                  [psg.Text("Generating audio 0/{}".format(card_count), key="GEN-AUDIO-TEXT")] ]
       return { "generating_audio" : generating_audio_layout }
