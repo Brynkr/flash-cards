@@ -18,9 +18,12 @@ class GUI:
    def __init__(self):
       self._deck_handler = DeckHandler()
       self._layout_maker = LayoutMaker()
-      self._voice_handler = VoiceHandler()
+      
+      # Init VoiceHandler only when used so internet connection is only required on audio generation request
+      self._voice_handler = None
 
       self._fullscreen = False
+      self._audio_enabled = True
       self._categories = self._deck_handler.categories
       self._categories[constants.CATEGORY_NO_TAGS] = False
 
@@ -33,7 +36,7 @@ class GUI:
          layouts = self._layout_maker.start(len(self._deck_handler.cards))
          window = psg.Window("Flash Cards", layouts["start"],
                              finalize=True, resizable=True, element_justification='c')
-         self.set_window_size(window, 420, 350)
+         self.set_window_size(window, 420, 380)
          self._deck_handler.shuffle_deck()
 
          event, values = window.read()
@@ -70,8 +73,9 @@ class GUI:
          elif event == "Fullscreen":
             self.toggle_fullscreen(window)
             continue
+         elif event == "Toggle Audio":
+            self.toggle_audio()
          elif event == "Generate Audio":
-            #TODO - progress bar popup for generating
             self.generate_audio(self._deck_handler.deck)
          elif event == "Exit" or event == psg.WIN_CLOSED:
             sys.exit()
@@ -80,13 +84,13 @@ class GUI:
    def display_cards(self, recent=False, priority=False):
       if recent:
          cards = self._deck_handler.category_card_filter(self._deck_handler.recent_cards,
-                                                        self._categories)
+                                                         self._categories)
       elif priority:
          cards = self._deck_handler.category_card_filter(self._deck_handler.priority_cards,
-                                                        self._categories)
+                                                         self._categories)
       else:
          cards = self._deck_handler.category_card_filter(self._deck_handler.cards,
-                                                        self._categories)
+                                                         self._categories)
 
       for card in cards:
          print("front = {}, back = {}".format(card.english, card.chinese))
@@ -105,7 +109,8 @@ class GUI:
                                    element_justification='c')
                self.set_window_size(window, 640, 210)
 
-               self._voice_handler.play_audio_file(card.english)
+               if self._audio_enabled:
+                  self._voice_handler.play_audio_file(card.english)
                
                event2, values2 = window.read()
                if event2 == constants.BUTTON_NEXT_TEXT:
@@ -157,7 +162,8 @@ class GUI:
                                 finalize=True, resizable=True, element_justification='c')
             self.set_window_size(window, 320, 120)
 
-            self._voice_handler.play_audio_file(card.english)
+            if self._audio_enabled:
+               self._voice_handler.play_audio_file(card.english)
 
             time.sleep(constants.AUTO_DISPLAY_DELAY)
             window.close()
@@ -210,7 +216,10 @@ class GUI:
                window = psg.Window("A", layouts["input_back"],
                                    finalize=True, resizable=True, element_justification='c')
                self.set_window_size(window, 280, 220)
-               self._voice_handler.play_audio_file(card.english)
+
+               if self._audio_enabled:
+                  self._voice_handler.play_audio_file(card.english)
+
                time.sleep(constants.ANSWER_DISPLAY_DELAY)
                window.close()
                return "Correct"
@@ -266,7 +275,22 @@ class GUI:
       window.close()
 
 
+   def toggle_audio(self):
+      layout = self._layout_maker.toggle_audio(self._audio_enabled)
+      window = psg.Window("Toggle audio",  layout["toggle_audio"],
+                          finalize=True, resizable=True, element_justification='c')
+      self.set_window_size(window, 240, 120)
+      self._audio_enabled = not self._audio_enabled
+
+      event, value = window.read()
+      if event == psg.WIN_CLOSED or event == constants.BUTTON_RETURN_TEXT:
+         window.close()
+
+
    def generate_audio(self, deck):
+      if not self._voice_handler:
+         self._voice_handler = VoiceHandler()
+
       layout = self._layout_maker.generating_audio(len(deck.cards))
       window = psg.Window("Generating Audio", layout["generating_audio"],
                           finalize=True, resizable=True, element_justification='c')

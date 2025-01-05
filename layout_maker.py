@@ -2,6 +2,15 @@ import PySimpleGUI as psg
 import constants
 
 
+# TODO - Standardise button sizes, define button constants for use
+# BUTTON_NEXT_TEXT            = "Next"
+# BUTTON_ANSWER_TEXT          = "Answer"
+# BUTTON_ADD_TEXT             = "Add"
+# BUTTON_PRIORITY_TEXT        = "Priority"
+# BUTTON_RETURN_TEXT          = "Return"
+# BUTTON_SAVE_AND_RETURN_TEXT = "Save and return"
+
+
 class LayoutMaker:
 
    def __init__(self):
@@ -29,11 +38,15 @@ class LayoutMaker:
                         psg.Button("Auto", size=(12, 2)),
                         psg.Button("Auto Priority", size=(12, 2))],
 
-                       [psg.Button("Add Cards", size=(12, 2)),
-                        psg.Button("Categories", size=(12, 2)),
-                        psg.Button("Fullscreen", size=(12, 2))],
+                       [psg.VPush()],
+                       [psg.VPush()],
 
-                       [psg.Button("Generate Audio", size=(12, 2)),
+                       [psg.Button("Add Cards", size=(12, 2)),
+                        psg.Button("Generate Audio", size=(12, 2)),
+                        psg.Button("Categories", size=(12, 2))],
+
+                       [psg.Button("Toggle Audio", size=(12, 2)),
+                        psg.Button("Fullscreen", size=(12, 2)),
                         psg.Button("Exit", size=(12, 2))],
                        [psg.VPush()] ]
 
@@ -44,25 +57,25 @@ class LayoutMaker:
       front_layout = [ [psg.VPush()],
                        [psg.Text(str(key), font=18)],
                        [psg.Text("")],
-                       [psg.Button("Answer", focus=True, bind_return_key=True, size=(40, 4)),
-                        psg.Button("Return", size=(16, 4))],
+                       [psg.Button(constants.BUTTON_ANSWER_TEXT, focus=True, bind_return_key=True, size=(40, 4)),
+                        psg.Button(constants.BUTTON_RETURN_TEXT, size=(16, 4))],
                        [psg.VPush()] ]
       if priority:
          back_layout = [ [psg.VPush()],
                          [psg.Text(str(key) + ':', font='Any 28')],
                          [psg.Text(str(value), font='Any 28', text_color='yellow')],
                          [psg.Text("")],
-                         [psg.Button("Next", focus=True, bind_return_key=True, size=(46, 4)),
-                          psg.Button("Return", size=(22, 4))],
+                         [psg.Button(constants.BUTTON_NEXT_TEXT, focus=True, bind_return_key=True, size=(46, 4)),
+                          psg.Button(constants.BUTTON_RETURN_TEXT, size=(22, 4))],
                          [psg.VPush()] ]
       else:
          back_layout = [ [psg.VPush()],
                          [psg.Text(str(key) + ':', font='Any 28')],
                          [psg.Text(str(value), font='Any 28', text_color='yellow')],
                          [psg.Text("")],
-                         [psg.Button("Next", focus=True, bind_return_key=True, size=(46, 3)),
-                          psg.Button("Priority", size=(8, 3)),
-                          psg.Button("Return", size=(8, 3))],
+                         [psg.Button(constants.BUTTON_NEXT_TEXT, focus=True, bind_return_key=True, size=(46, 3)),
+                          psg.Button(constants.BUTTON_PRIORITY_TEXT, size=(8, 3)),
+                          psg.Button(constants.BUTTON_RETURN_TEXT, size=(8, 3))],
                          [psg.VPush()] ]
       
       return { "front" : front_layout,
@@ -73,8 +86,8 @@ class LayoutMaker:
       input_front_layout = [ [psg.VPush()],
                              [psg.Text(str(key), font=18)],
                              [psg.Input(size=(40, 4))],
-                             [psg.Button("Answer", focus=True, bind_return_key=True, size=(7, 3)),
-                              psg.Button("Return", size=(7, 3))],
+                             [psg.Button(constants.BUTTON_ANSWER_TEXT, focus=True, bind_return_key=True, size=(7, 3)),
+                              psg.Button(constants.BUTTON_RETURN_TEXT, size=(7, 3))],
                              [psg.VPush()] ]
       input_back_layout = [ [psg.VPush()],
                             [psg.Text(str(key) + ':', font='Any 28', text_color='green2')],
@@ -104,19 +117,19 @@ class LayoutMaker:
                                  [psg.Text("Add any number of cards. Format {} : {}")],
                                  [psg.Input(size=(40, 4))],
                                  [psg.Text("")],
-                                 [psg.Button("Add", focus=True, bind_return_key=True), psg.Button("Return")],
+                                 [psg.Button(constants.BUTTON_ADD_TEXT, focus=True, bind_return_key=True), psg.Button(constants.BUTTON_RETURN_TEXT)],
                                  [psg.VPush()] ]
       add_cards_back_layout = [ [psg.VPush()],
                                 [psg.Text("Add any number of cards. Format {} : {}")],
                                 [psg.Input(size=(40, 4))],
                                 [psg.Text("Added card", text_color='green')],
-                                [psg.Button("Add", focus=True, bind_return_key=True), psg.Button("Return")],
+                                [psg.Button(constants.BUTTON_ADD_TEXT, focus=True, bind_return_key=True), psg.Button(constants.BUTTON_RETURN_TEXT)],
                                 [psg.VPush()] ]
       invalid_syntax_layout = [ [psg.VPush()],
                                 [psg.Text("Add any number of cards. Format {} : {}")],
                                 [psg.Input(size=(40, 4))],
                                 [psg.Text("Invalid syntax. Must be key value pair.", text_color='red')],
-                                [psg.Button("Add", focus=True, bind_return_key=True), psg.Button("Return")],
+                                [psg.Button(constants.BUTTON_ADD_TEXT, focus=True, bind_return_key=True), psg.Button(constants.BUTTON_RETURN_TEXT)],
                                 [psg.VPush()] ]
       return { "add_cards_start" : add_cards_start_layout,
                "add_cards_back" : add_cards_back_layout,
@@ -135,6 +148,13 @@ class LayoutMaker:
       category_layout.append([psg.Button("Save and return", size=(8, 3))])
       category_layout.append([psg.VPush()])
       return { "category_select" : category_layout }
+
+
+   def toggle_audio(self, audio_currently_enabled):
+      if audio_currently_enabled:
+         return { "toggle_audio" : [ [psg.Text("Audio disabled")], [psg.Button(constants.BUTTON_RETURN_TEXT)] ] }
+      else:
+         return { "toggle_audio" : [ [psg.Text("Audio enabled")], [psg.Button(constants.BUTTON_RETURN_TEXT)] ] }
 
 
    def generating_audio(self, card_count):

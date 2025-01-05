@@ -14,11 +14,15 @@ RECENT_CARDS_AMOUNT = 100
 COMMENTED_LINE_CHAR = "#"
 CARD_SIDE_DELIMITER = ":"
 WORD_DELIMITER = "/"
+
+# TODO - move to layout constants, define buttons.. standardise size
 BUTTON_NEXT_TEXT = "Next"
+BUTTON_ANSWER_TEXT = "Answer"
 BUTTON_ADD_TEXT = "Add"
 BUTTON_PRIORITY_TEXT = "Priority"
 BUTTON_RETURN_TEXT = "Return"
 BUTTON_SAVE_AND_RETURN_TEXT = "Save and return"
+
 CARD_PRIORITY_TAG = "p"
 CATEGORY_NO_TAGS = "The rest"
 CATEGORY_ALL = "All"
