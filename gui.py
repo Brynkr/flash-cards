@@ -29,16 +29,11 @@ class GUI:
 
 
    def start_menu(self):
-      layouts = self._layout_maker.start(len(self._deck_handler.cards))
-      window = psg.Window("Flash Cards", layouts["start"],
-                          finalize=True, resizable=True, element_justification='c')
-      self.set_window_size(window, 420, 380)
-
       while True:
-         # layouts = self._layout_maker.start(len(self._deck_handler.cards))
-         # window = psg.Window("Flash Cards", layouts["start"],
-         #                     finalize=True, resizable=True, element_justification='c')
-         # self.set_window_size(window, 420, 380)
+         layouts = self._layout_maker.start(len(self._deck_handler.cards))
+         window = psg.Window("Flash Cards", layouts["start"],
+                             finalize=True, resizable=True, element_justification='c')
+         self.set_window_size(window, 420, 380)
          self._deck_handler.shuffle_deck()
 
          event, values = window.read()
@@ -50,13 +45,13 @@ class GUI:
 
          if event == "Study":
             window.close()
-            self.display_cards()
+            self.display_study()
          elif event == "Study Recent (100)":
             window.close()
-            self.display_cards(recent=True)
+            self.display_study(recent=True)
          elif event == "Priority Study":
             window.close()
-            self.display_cards(priority=True)
+            self.display_study(priority=True)
          elif event == "Input Study":
             window.close()
             self.input_study()
@@ -83,7 +78,7 @@ class GUI:
             sys.exit()
 
 
-   def display_cards(self, recent=False, priority=False):
+   def display_study(self, recent=False, priority=False):
       if recent:
          cards = self._deck_handler.category_card_filter(self._deck_handler.recent_cards,
                                                          self._categories)

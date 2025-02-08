@@ -32,8 +32,11 @@ class VoiceHandler:
         self._is_enabled = False
         self._play_english = False
 
-        self._pyht_client = Client(user_id=constants.PLAYHT_USER_ID,
-                                   api_key=constants.PLAYHT_API_KEY)
+        try:
+            self._pyht_client = Client(user_id=constants.PLAYHT_USER_ID,
+                                       api_key=constants.PLAYHT_API_KEY)
+        except requests.exceptions.HTTPError:
+            self._pyht_client = None
 
         self._pyht_chinese_options = TTSOptions(voice=constants.PLAYHT_CHINESE_VOICE,
                                                  language=Language("mandarin"), speed=0.6)
@@ -43,7 +46,11 @@ class VoiceHandler:
 
 
     def enable(self):
-        self._is_enabled = True
+        if self._pyht_client == None:
+            print("No PlayHT client - can't enable voice.")
+            self._is_enabled = False
+        else:
+            self._is_enabled = True
     def disable(self):
         self._is_enabled = False
 
