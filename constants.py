@@ -1,14 +1,15 @@
 CARD_PATH = "/Users/bryn/Documents/PyProjects/flashcards/cards.txt"
 PRIORITY_CARD_PATH = "/Users/bryn/Documents/PyProjects/flashcards/priority_cards.txt"
-AUDIO_PATH = "/Users/bryn/Documents/PyProjects/flashcards/audio/"
+AUDIO_PATH = "/Users/bryn/Documents/PyProjects/flashcards/audio"
 
 GUI_THEME = "DarkTeal2"
 ENGLISH_INDEX = 0
 CHINESE_INDEX = 1
 TAG_INDEX = 2
 WORD_LEN_LIM = 30
-ANSWER_DISPLAY_DELAY = 8
-AUTO_DISPLAY_DELAY = 10
+ANSWER_DISPLAY_DELAY_SEC = 8
+AUTO_DISPLAY_DELAY_SEC = 10
+TOGGLE_DISPLAY_DELAY_SEC = 2
 RECENT_CARDS_AMOUNT = 100
 
 COMMENTED_LINE_CHAR = "#"
@@ -37,5 +38,6 @@ UNICODE_ALPHABET_UPPERCASE_END = 90
 PLAYHT_USER_ID = "8HjSepUDWIa1FBQO6SEwuUryUlL2"
 PLAYHT_API_KEY = "fde0d22bd65449ed9a46bd340fc46710"
 PLAYHT_API_URL = "https://api.play.ht/api/v2/tts/stream"
-PLAYHT_VOICE = "s3://voice-cloning-zero-shot/0de4c615-277c-43dd-b624-cae756d44582/cn-voice1/manifest.json"
+PLAYHT_CHINESE_VOICE = "s3://voice-cloning-zero-shot/0de4c615-277c-43dd-b624-cae756d44582/cn-voice1/manifest.json"
+PLAYHT_ENGLISH_VOICE = "s3://voice-cloning-zero-shot/028a32d4-6a79-4ca3-a303-d6559843114b/chris/manifest.json"
 PLAYHT_VOICE_ENGINE="Play3.0-mini-http"
