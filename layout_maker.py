@@ -152,9 +152,9 @@ class LayoutMaker:
 
    def toggle_audio(self, audio_currently_enabled):
       if audio_currently_enabled:
-         return { "toggle_audio" : [ [psg.Text("Audio disabled")], [psg.Button(constants.BUTTON_RETURN_TEXT)] ] }
+         return { "toggle_audio" : [ [psg.Text("Audio disabled")] ] }
       else:
-         return { "toggle_audio" : [ [psg.Text("Audio enabled")], [psg.Button(constants.BUTTON_RETURN_TEXT)] ] }
+         return { "toggle_audio" : [ [psg.Text("Audio enabled")] ] }
 
 
    def generating_audio(self, card_count):
