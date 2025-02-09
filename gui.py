@@ -15,6 +15,20 @@ from voice_handler import VoiceHandler
 # FIXME - refactor to main.py? separate some functions out of GUI class
 
 class GUI:
+   MENU_STUDY = "Study"
+   MENU_STUDY_RECENT = "Study Recent (100)"
+   MENU_PRIORITY_STUDY = "Priority Study"
+   MENU_INPUT_STUDY = "Input Study"
+   MENU_AUTO_STUDY = "Auto"
+   MENU_AUTO_PRIORITY_STUDY = "Auto Priority"
+   MENU_ADD_CARDS = "Add Cards"
+   MENU_CATEGORIES = "Categories"
+   MENU_FULLSCREEN = "Fullscreen"
+   MENU_TOGGLE_AUDIO = "Toggle Audio"
+   MENU_GENERATE_AUDIO = "Generate Audio"
+   MENU_EXIT = "Exit"
+
+
    def __init__(self):
       self._deck_handler = DeckHandler()
       self._layout_maker = LayoutMaker()
@@ -43,39 +57,40 @@ class GUI:
                print("No cards in the deck! Can't continue until cards are added.")
                sys.exit()
 
-         if event == "Study":
-            window.close()
-            self.display_study()
-         elif event == "Study Recent (100)":
-            window.close()
-            self.display_study(recent=True)
-         elif event == "Priority Study":
-            window.close()
-            self.display_study(priority=True)
-         elif event == "Input Study":
-            window.close()
-            self.input_study()
-         elif event == "Auto":
-            window.close()
-            self.auto_study()
-         elif event == "Auto Priority":
-            window.close()
-            self.auto_study(priority=True)
-         elif event == "Add Cards":
-            window.close()
-            self.add_cards()
-         elif event == "Categories":
-            window.close()
-            self.select_categories()
-         elif event == "Fullscreen":
-            self.toggle_fullscreen(window)
-            continue
-         elif event == "Toggle Audio":
-            self.toggle_audio()
-         elif event == "Generate Audio":
-            self.generate_audio(self._deck_handler.deck)
-         elif event == "Exit" or event == psg.WIN_CLOSED:
-            sys.exit()
+         match event:
+            case self.MENU_STUDY:
+               window.close()
+               self.display_study()
+            case self.MENU_STUDY_RECENT:
+               window.close()
+               self.display_study(recent=True)
+            case self.MENU_PRIORITY_STUDY:
+               window.close()
+               self.display_study(priority=True)
+            case self.MENU_INPUT_STUDY:
+               window.close()
+               self.input_study()
+            case self.MENU_AUTO_STUDY:
+               window.close()
+               self.auto_study()
+            case self.MENU_AUTO_PRIORITY_STUDY:
+               window.close()
+               self.auto_study(priority=True)
+            case self.MENU_ADD_CARDS:
+               window.close()
+               self.add_cards()
+            case self.MENU_CATEGORIES:
+               window.close()
+               self.select_categories()
+            case self.MENU_FULLSCREEN:
+               self.toggle_fullscreen(window)
+               continue
+            case self.MENU_TOGGLE_AUDIO:
+               self.toggle_audio()
+            case self.MENU_GENERATE_AUDIO:
+               self.generate_audio(self._deck_handler.deck)
+            case self.MENU_EXIT | psg.WIN_CLOSED:
+               sys.exit()
 
 
    def display_study(self, recent=False, priority=False):
