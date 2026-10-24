@@ -47,9 +47,9 @@ class ReviewDueTests(unittest.TestCase):
         self.history.record_review('Future', 'hǎo 好', True, reviewed_at=now)
         self.history.record_review('Missed', 'cuò 错', False, reviewed_at=now)
 
-    def test_reviews_only_due_cards_in_filtered_order(self):
+    def test_reviews_only_previously_graded_due_cards(self):
         self.gui.review_due()
-        self.assertEqual(self.seen, ['New', 'Missed'])
+        self.assertEqual(self.seen, ['Missed'])
         self.gui._show_completion.assert_called_once()
         self.assertEqual(self.deck.filtered, [(self.deck.cards, self.categories)])
 
@@ -61,7 +61,7 @@ class ReviewDueTests(unittest.TestCase):
     def test_return_exits_without_showing_completion(self):
         self.gui._input_answer_poll = lambda card: self.seen.append(card.english) or constants.BUTTON_RETURN_TEXT
         self.gui.review_due()
-        self.assertEqual(self.seen, ['New'])
+        self.assertEqual(self.seen, ['Missed'])
         self.gui._show_completion.assert_not_called()
 
     def test_closed_answer_window_exits_session(self):
@@ -75,7 +75,7 @@ class ReviewDueTests(unittest.TestCase):
             return 'Correct'
         self.gui._input_answer_poll = answer
         self.gui.review_due()
-        self.assertEqual(len(self.history.reviews_for('New', 'xīn 新')), 1)
+        self.assertEqual(len(self.history.reviews_for('New', 'xīn 新')), 0)
         self.assertEqual(len(self.history.reviews_for('Missed', 'cuò 错')), 2)
         # Only due again if its future interval elapses.
         self.seen.clear()
@@ -85,12 +85,21 @@ class ReviewDueTests(unittest.TestCase):
         self.assertEqual(self.seen, [])
         info.assert_called_once()
 
-    def test_no_due_cards_shows_caught_up(self):
+    def test_no_due_cards_shows_informational_message(self):
         self.deck.cards = [self.future]
         with patch('tk_gui.messagebox.showinfo') as info:
             self.gui.review_due()
         info.assert_called_once()
         self.assertEqual(self.seen, [])
+        self.gui._show_completion.assert_not_called()
+
+    def test_only_unseen_cards_show_no_reviews_due_message(self):
+        self.deck.cards = [self.new]
+        with patch('tk_gui.messagebox.showinfo') as info:
+            self.gui.review_due()
+        self.assertEqual(self.seen, [])
+        info.assert_called_once()
+        self.assertEqual(info.call_args.args[0], 'No reviews due')
         self.gui._show_completion.assert_not_called()
 
     def test_database_read_error_does_not_crash(self):

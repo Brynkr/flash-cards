@@ -7,7 +7,7 @@ import constants
 from deck_handler import DeckHandler
 from tk_layout_maker import TkLayoutMaker
 from study_core.history import ReviewHistory
-from study_core.scheduler import due_cards
+from study_core.scheduler import prioritized_due_cards
 from study_core.progress import load_progress
 from study_core.goals import load_goals, save_daily_target
 from study_core.appearance import (
@@ -432,7 +432,7 @@ class GUI:
         self._show_completion()
 
     def review_due(self):
-        """Study due cards once, respecting active categories and using typed answers.
+        """Review previously graded due cards once, respecting active categories.
 
         A wrong card is due again at the next session, not repeated endlessly in
         this one. Viewing, returning, and selection do not record reviews.
@@ -443,7 +443,7 @@ class GUI:
         try:
             if self._review_history is None:
                 self._review_history = ReviewHistory()
-            selected = due_cards(cards, self._review_history)
+            selected = prioritized_due_cards(cards, self._review_history)
         except (sqlite3.Error, OSError, RuntimeError) as error:
             messagebox.showwarning(
                 "Review unavailable", f"Could not load due cards:\n{error}",
@@ -453,7 +453,7 @@ class GUI:
 
         if not selected:
             messagebox.showinfo(
-                "All caught up", "No flashcards are due in the selected categories.",
+                "No reviews due", "No previously studied cards are due in the selected categories.",
                 parent=self.root,
             )
             return

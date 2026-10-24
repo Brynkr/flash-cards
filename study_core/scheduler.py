@@ -86,3 +86,41 @@ def due_cards(
     current = _aware_utc(now if now is not None else datetime.now(timezone.utc), "now")
     return [card for card in cards
             if schedule_for_card(history, card.english, card.chinese, now=current).is_due]
+
+
+def prioritized_due_cards(
+    cards: Iterable[_Card], history: ReviewHistory, *, now: datetime | None = None
+) -> list[_Card]:
+    """Return only previously graded, due cards in difficulty/overdue order.
+
+    Never introduce unseen vocabulary in Review Due: the user learns those
+    through Study, Study Recent, or other study modes. Incorrect reviews rank
+    before other due reviews, followed by overdue age and number of mistakes.
+    Equal priorities retain the original deck order. This is read-only and
+    uses the existing scheduling intervals unchanged.
+    """
+    current = _aware_utc(now if now is not None else datetime.now(timezone.utc), "now")
+    reviewed = []
+
+    for index, card in enumerate(cards):
+        events = history.reviews_for(card.english, card.chinese)
+        # Never-graded cards are "due" in the low-level scheduler, but are
+        # not eligible for this dedicated review-only study mode.
+        if not events:
+            continue
+        schedule = schedule_from_events(events, now=current)
+        if not schedule.is_due:
+            continue
+
+        latest = max(events, key=lambda event:
+                     (_aware_utc(event.reviewed_at, "reviewed_at"), event.id))
+        incorrect_count = sum(not event.correct for event in events)
+        overdue_seconds = max(0.0, (current - schedule.due_at).total_seconds())
+        reviewed.append((
+            latest.correct, overdue_seconds, incorrect_count, index, card,
+        ))
+
+    # False sorts before True; within each group, prefer more overdue and
+    # more previous mistakes. The original deck position is a stable tie-break.
+    reviewed.sort(key=lambda row: (row[0], -row[1], -row[2], row[3]))
+    return [row[4] for row in reviewed]
