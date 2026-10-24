@@ -13,6 +13,9 @@ from study_core.scheduler import prioritized_due_cards
 from study_core.adaptive import adaptive_due_cards
 from study_core.progress import load_progress
 from study_core.goals import load_goals, save_daily_target
+from study_core.review_preferences import (
+    load_review_mode, save_review_mode, choose_review_mode,
+)
 from study_core.appearance import (
     BACKGROUND_PRESETS, BUTTON_PRESETS, is_readable_background,
     is_readable_button, load_background, load_buttons, active_button_color,
@@ -28,6 +31,7 @@ class GUI:
     MENU_PRIORITY_STUDY = "Priority Study"
     MENU_INPUT_STUDY = "Input Study"
     MENU_REVIEW_DUE = "Review Due"
+    MENU_REVIEW_SETTINGS = "Review Settings"
     MENU_PROGRESS = "Progress"
     MENU_AUTO_STUDY = "Auto"
     MENU_AUTO_PRIORITY_STUDY = "Auto Priority"
@@ -125,6 +129,8 @@ class GUI:
                     self.input_study()
                 case self.MENU_REVIEW_DUE:
                     self.review_due()
+                case self.MENU_REVIEW_SETTINGS:
+                    self.review_settings()
                 case self.MENU_PROGRESS:
                     self.show_progress()
                 case self.MENU_AUTO_STUDY:
@@ -440,6 +446,27 @@ class GUI:
 
         self._show_completion()
 
+    def review_settings(self):
+        """Edit the privately saved Review Due algorithm, without touching history."""
+        try:
+            current = load_review_mode()
+        except (OSError, ValueError) as error:
+            messagebox.showwarning(
+                "Review settings unavailable", f"Could not read review settings:\n{error}",
+                parent=self.root,
+            )
+            return
+        choice = choose_review_mode(self.root, current)
+        if choice is None:
+            return
+        try:
+            save_review_mode(choice)
+        except (OSError, ValueError) as error:
+            messagebox.showwarning(
+                "Review settings not saved", f"Could not save review settings:\n{error}",
+                parent=self.root,
+            )
+
     def review_due(self):
         """Review previously graded due cards once, respecting active categories.
 
@@ -454,11 +481,12 @@ class GUI:
                 self._review_history = ReviewHistory()
             # Experimental v1.2 scheduler must be explicitly enabled per launch.
             # Leave existing Review Due as the default until validated on real data.
-            if os.environ.get('FLASHCARDS_ADAPTIVE_REVIEWS') == '1':
+            if (os.environ.get('FLASHCARDS_ADAPTIVE_REVIEWS') == '1'
+                    or load_review_mode() == 'adaptive'):
                 selected = adaptive_due_cards(cards, self._review_history)
             else:
                 selected = prioritized_due_cards(cards, self._review_history)
-        except (sqlite3.Error, OSError, RuntimeError) as error:
+        except (sqlite3.Error, OSError, RuntimeError, ValueError) as error:
             messagebox.showwarning(
                 "Review unavailable", f"Could not load due cards:\n{error}",
                 parent=self.root,

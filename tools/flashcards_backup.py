@@ -33,7 +33,7 @@ DEFAULT_DATA = Path(os.environ.get("FLASH_CARDS_DATA_DIR") or
 DEFAULT_BACKUPS = Path(os.environ.get("FLASH_CARDS_BACKUP_DIR") or
                        _default_parent() / "Flashcards-v1.1-backups").expanduser()
 BACKUP_PREFIX = "flashcards-backup-"
-FILE_NAMES = ("cards.txt", "priority_cards.txt", "flashcards.db", "study_goals.json")
+FILE_NAMES = ("cards.txt", "priority_cards.txt", "flashcards.db", "study_goals.json", "review_settings.json")
 
 
 class BackupError(Exception):
@@ -110,7 +110,7 @@ def create_backup(data_dir=DEFAULT_DATA, backups_dir=DEFAULT_BACKUPS):
             temp_archive.chmod(0o600)
             manifest = {"format": "flashcards-backup-v1", "created_at_utc": datetime.now(timezone.utc).isoformat(), "files": {}}
             with zipfile.ZipFile(temp_archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
-                for filename in ("cards.txt", "priority_cards.txt", "study_goals.json"):
+                for filename in ("cards.txt", "priority_cards.txt", "study_goals.json", "review_settings.json"):
                     source = data_dir / filename
                     if source.exists() or source.is_symlink():
                         _regular_file(source)

@@ -9,6 +9,10 @@ from tk_gui import GUI
 
 class OptInReviewDueTests(unittest.TestCase):
     def setUp(self):
+        # Avoid dependence on the current user's saved scheduler setting.
+        mode_patcher = patch("tk_gui.load_review_mode", return_value="standard")
+        mode_patcher.start()
+        self.addCleanup(mode_patcher.stop)
         self.gui = GUI.__new__(GUI)
         self.gui._categories = {"All": False}
         self.card = SimpleNamespace(english="Card", chinese="卡")

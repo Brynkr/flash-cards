@@ -87,3 +87,16 @@ python3 -m unittest discover -s tests -q
 
 The application has been exercised on macOS. Packaging and dependencies on a
 completely fresh computer should still be tested before distributing broadly.
+
+## Review scheduling preference (v1.2)
+
+Choose **Review Settings** from the main menu to switch Review Due between
+**Standard (v1.1)** and **Adaptive (v1.2 experimental)**. Standard remains the
+safe initial default. The selection is saved privately in `review_settings.json`
+and included in backups made by the repository launcher. The one-launch
+`FLASHCARDS_ADAPTIVE_REVIEWS=1` override still enables Adaptive mode. Review
+history and the vocabulary file are never rewritten by changing the setting.
+
+If you use an older personal Desktop launcher that invokes an external backup
+script instead of this repository's launcher, update that external backup script
+before relying on it to include `review_settings.json`.

@@ -212,6 +212,13 @@ class TkLayoutMaker:
             lambda: on_menu_selection("Exit")
         ).pack(side=tk.LEFT, padx=5)
 
+        # v1.2: independent scheduler preference; standard remains the default.
+        self._create_button(
+            main_frame, "Review Settings",
+            lambda: on_menu_selection("Review Settings"),
+            width=18, height=1,
+        ).pack(pady=(8, 0))
+
     def create_progress_layout(self, window, report, on_return, *, goals=None, on_save_goal=None):
         """Render saved graded progress; do not mutate history or deck state."""
         window.configure(bg=self.bg_color)
