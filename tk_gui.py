@@ -5,6 +5,8 @@ from tkinter import ttk, messagebox
 import constants
 from deck_handler import DeckHandler
 from tk_layout_maker import TkLayoutMaker
+from study_core.history import ReviewHistory
+import sqlite3
 import threading
 
 
@@ -24,6 +26,7 @@ class GUI:
     def __init__(self):
         self._deck_handler  = DeckHandler()
         self._layout_maker  = TkLayoutMaker()
+        self._review_history = None  # Open the database only after a submitted answer.
 
         self._fullscreen = False
         self._categories = self._deck_handler.categories
@@ -224,6 +227,12 @@ class GUI:
 
         self._show_completion()
 
+    def _record_input_review(self, card, correct):
+        """Persist one graded Input Study attempt (never the typed response)."""
+        if self._review_history is None:
+            self._review_history = ReviewHistory()
+        self._review_history.record_review(card.english, card.chinese, correct, mode="input")
+
     def _input_answer_poll(self, card):
         """Poll for input answer"""
         window = tk.Toplevel(self.root)
@@ -233,14 +242,24 @@ class GUI:
         user_input = {"value": ""}
 
         def on_answer():
-            if self._deck_handler.correct_answer(card.chinese, user_input["value"]):
-                window.destroy()
+            if result["action"] is not None:
+                return  # Ignore a second click on the same answer.
+            correct = self._deck_handler.correct_answer(card.chinese, user_input["value"])
+            result["action"] = "Correct" if correct else "Incorrect"
+            try:
+                self._record_input_review(card, correct)
+            except (sqlite3.Error, OSError, RuntimeError) as error:
+                # A database problem should not trap the user in the study window.
+                messagebox.showwarning(
+                    "Review not saved",
+                    f"Answer checked, but the review was not saved:\n{error}",
+                    parent=window,
+                )
+            window.destroy()
+            if correct:
                 self._show_correct_answer(card)
-                result["action"] = "Correct"
             else:
-                window.destroy()
                 self._show_incorrect_answer(card)
-                result["action"] = "Incorrect"
 
         def on_return():
             result["action"] = constants.BUTTON_RETURN_TEXT
