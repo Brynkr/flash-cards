@@ -166,6 +166,10 @@ class TkLayoutMaker:
             review_row, "Review Due",
             lambda: on_menu_selection("Review Due"), width=20
         ).pack(side=tk.LEFT, padx=5)
+        self._create_button(
+            review_row, "Progress",
+            lambda: on_menu_selection("Progress"), width=18
+        ).pack(side=tk.LEFT, padx=5)
 
         # Spacer
         tk.Frame(main_frame, bg=self.bg_color, height=20).pack()
@@ -207,6 +211,52 @@ class TkLayoutMaker:
             row4, "Exit",
             lambda: on_menu_selection("Exit")
         ).pack(side=tk.LEFT, padx=5)
+
+    def create_progress_layout(self, window, report, on_return):
+        """Render saved graded progress; do not mutate history or deck state."""
+        window.configure(bg=self.bg_color)
+        frame = tk.Frame(window, bg=self.bg_color)
+        frame.pack(fill=tk.BOTH, expand=True, padx=24, pady=15)
+
+        self._create_label(frame, "Study Progress", 20).pack(pady=(0, 10))
+        metrics = (
+            ("Unique deck cards", report.total_cards),
+            ("Cards reviewed", report.reviewed_cards),
+            ("Cards due now", report.due_cards),
+            ("Graded attempts", report.attempts),
+            ("Correct attempts", report.correct),
+            ("Answer accuracy", "Not yet available" if report.accuracy_percent is None
+             else f"{report.accuracy_percent}%"),
+        )
+        for name, value in metrics:
+            row = tk.Frame(frame, bg=self.bg_color)
+            row.pack(fill=tk.X, pady=2)
+            self._create_label(row, name, 11).pack(side=tk.LEFT)
+            self._create_label(row, str(value), 11, self.green_color).pack(side=tk.RIGHT)
+
+        self._create_label(frame, "Graded reviews — last 7 days", 13).pack(
+            pady=(16, 7)
+        )
+        max_count = max((count for _, count in report.daily_reviews), default=0)
+        for day, count in report.daily_reviews:
+            row = tk.Frame(frame, bg=self.bg_color)
+            row.pack(fill=tk.X, pady=2)
+            self._create_label(row, day.strftime("%a %d %b"), 10,
+                               width=13, anchor="w").pack(side=tk.LEFT)
+            track = tk.Frame(row, bg=self.button_bg, height=13, width=210)
+            track.pack(side=tk.LEFT, padx=(6, 8))
+            track.pack_propagate(False)
+            if count:
+                tk.Frame(track, bg=self.green_color, height=13,
+                         width=round(count * 210 / max_count)).place(x=0, y=0)
+            self._create_label(row, str(count), 10).pack(side=tk.LEFT)
+
+        self._create_label(
+            frame, "Only graded answers count. Viewing cards and Auto Study do not.",
+            9, wraplength=450, justify=tk.CENTER,
+        ).pack(pady=(16, 6))
+        self._create_button(frame, "Return to Menu", on_return, width=19,
+                            height=1).pack(pady=(4, 0))
 
     def create_display_front_layout(self, window, key, on_answer, on_return):
         """Create front of flashcard display"""
