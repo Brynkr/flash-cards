@@ -14,7 +14,7 @@ Policy (intentionally simple and deterministic, not SM-2 or FSRS):
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import Iterable
+from typing import Iterable, TypeVar
 
 from study_core.history import ReviewEvent, ReviewHistory
 
@@ -92,3 +92,32 @@ def adaptive_schedule_for_card(
 ) -> AdaptiveSchedule:
     """Read only: consult the existing append-only SQLite review records."""
     return adaptive_schedule_from_events(history.reviews_for(front, back), now=now)
+
+
+_Card = TypeVar("_Card")
+
+
+def adaptive_due_cards(
+    cards: Iterable[_Card], history: ReviewHistory, *, now: datetime | None = None
+) -> list[_Card]:
+    """Select only previously graded adaptive-due cards, retaining v1.1 priority rules.
+
+    This function never writes history. Selection favours latest misses, older
+    overdue dates, then higher mistake count; deck order breaks exact ties.
+    A card without graded reviews remains available in learning modes only.
+    """
+    current = _utc(now if now is not None else datetime.now(timezone.utc), "now")
+    ranked = []
+    for index, card in enumerate(cards):
+        events = history.reviews_for(card.english, card.chinese)
+        if not events:
+            continue
+        schedule = adaptive_schedule_from_events(events, now=current)
+        if not schedule.is_due:
+            continue
+        latest = max(events, key=lambda event: (_utc(event.reviewed_at, "reviewed_at"), event.id))
+        overdue_seconds = max(0.0, (current - schedule.due_at).total_seconds())
+        mistakes = sum(not event.correct for event in events)
+        ranked.append((latest.correct, -overdue_seconds, -mistakes, index, card))
+    ranked.sort(key=lambda item: item[:4])
+    return [item[4] for item in ranked]

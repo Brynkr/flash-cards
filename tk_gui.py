@@ -7,7 +7,9 @@ import constants
 from deck_handler import DeckHandler
 from tk_layout_maker import TkLayoutMaker
 from study_core.history import ReviewHistory
+import os
 from study_core.scheduler import prioritized_due_cards
+from study_core.adaptive import adaptive_due_cards
 from study_core.progress import load_progress
 from study_core.goals import load_goals, save_daily_target
 from study_core.appearance import (
@@ -443,7 +445,12 @@ class GUI:
         try:
             if self._review_history is None:
                 self._review_history = ReviewHistory()
-            selected = prioritized_due_cards(cards, self._review_history)
+            # Experimental v1.2 scheduler must be explicitly enabled per launch.
+            # Leave existing Review Due as the default until validated on real data.
+            if os.environ.get('FLASHCARDS_ADAPTIVE_REVIEWS') == '1':
+                selected = adaptive_due_cards(cards, self._review_history)
+            else:
+                selected = prioritized_due_cards(cards, self._review_history)
         except (sqlite3.Error, OSError, RuntimeError) as error:
             messagebox.showwarning(
                 "Review unavailable", f"Could not load due cards:\n{error}",
