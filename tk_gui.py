@@ -9,6 +9,7 @@ from tk_layout_maker import TkLayoutMaker
 from study_core.history import ReviewHistory
 from study_core.scheduler import due_cards
 from study_core.progress import load_progress
+from study_core.goals import load_goals, save_daily_target
 from study_core.appearance import (
     BACKGROUND_PRESETS, BUTTON_PRESETS, is_readable_background,
     is_readable_button, load_background, load_buttons, active_button_color,
@@ -465,10 +466,11 @@ class GUI:
         self._show_completion()
 
     def show_progress(self):
-        """Show a read-only overview of the current deck's graded reviews."""
+        """Show progress, daily target and streaks without writing study history."""
+        path = getattr(self._review_history, "path", None)
         try:
-            path = getattr(self._review_history, "path", None)
             report = load_progress(self._deck_handler.cards, db_path=path)
+            goals = load_goals(self._deck_handler.cards, db_path=path)
         except (sqlite3.Error, OSError, RuntimeError, ValueError) as error:
             messagebox.showwarning(
                 "Progress unavailable", f"Could not read study progress:\n{error}",
@@ -478,8 +480,22 @@ class GUI:
 
         window = tk.Toplevel(self.root)
         window.title("Study Progress")
-        self._layout_maker.create_progress_layout(window, report, window.destroy)
-        self.set_window_size(window, 530, 570)
+
+        def on_save_goal(value):
+            try:
+                save_daily_target(value)
+                return load_goals(self._deck_handler.cards, db_path=path)
+            except (sqlite3.Error, OSError, RuntimeError, ValueError) as error:
+                messagebox.showwarning(
+                    "Goal not saved", f"Could not save daily goal:\n{error}",
+                    parent=window,
+                )
+                return None
+
+        self._layout_maker.create_progress_layout(
+            window, report, window.destroy, goals=goals, on_save_goal=on_save_goal,
+        )
+        self.set_window_size(window, 560, 700)
         window.protocol("WM_DELETE_WINDOW", window.destroy)
         window.wait_window()
 

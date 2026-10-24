@@ -212,7 +212,7 @@ class TkLayoutMaker:
             lambda: on_menu_selection("Exit")
         ).pack(side=tk.LEFT, padx=5)
 
-    def create_progress_layout(self, window, report, on_return):
+    def create_progress_layout(self, window, report, on_return, *, goals=None, on_save_goal=None):
         """Render saved graded progress; do not mutate history or deck state."""
         window.configure(bg=self.bg_color)
         frame = tk.Frame(window, bg=self.bg_color)
@@ -233,6 +233,73 @@ class TkLayoutMaker:
             row.pack(fill=tk.X, pady=2)
             self._create_label(row, name, 11).pack(side=tk.LEFT)
             self._create_label(row, str(value), 11, self.green_color).pack(side=tk.RIGHT)
+
+        if goals is not None:
+            self._create_label(frame, "Daily Study Goal", 14).pack(pady=(12, 3))
+            summary = self._create_label(
+                frame, f"Today: {goals.completed_today}/{goals.target} graded reviews", 11
+            )
+            summary.pack(pady=2)
+            progress_track = tk.Frame(frame, bg=self.button_bg, height=12, width=260)
+            progress_track.pack(pady=3)
+            progress_track.pack_propagate(False)
+            progress_fill = tk.Frame(progress_track, bg=self.green_color, height=12)
+            progress_fill.place(x=0, y=0, width=round(260 * min(1, goals.completed_today / goals.target)))
+            completion = self._create_label(
+                frame, "Daily goal achieved" if goals.goal_reached
+                else f"{goals.remaining} reviews to reach today's goal", 10
+            )
+            completion.pack(pady=2)
+            streak = self._create_label(
+                frame,
+                f"Current streak: {goals.current_streak} days    Longest: {goals.longest_streak} days",
+                11,
+            )
+            streak.pack(pady=2)
+            self._create_label(
+                frame, "Streaks count days with at least one graded review.", 9
+            ).pack(pady=1)
+            if on_save_goal is not None:
+                edit_row = tk.Frame(frame, bg=self.bg_color)
+                edit_row.pack(pady=4)
+                self._create_label(edit_row, "Daily target (1–500):", 10).pack(side=tk.LEFT, padx=4)
+                target_value = tk.StringVar(master=window, value=str(goals.target))
+                entry = tk.Spinbox(
+                    edit_row, from_=1, to=500, width=5, textvariable=target_value,
+                    font=('Arial', 11), bg=self.entry_bg, fg=self.fg_color,
+                )
+                entry.pack(side=tk.LEFT, padx=4)
+
+                def save_goal():
+                    try:
+                        value = int(entry.get())
+                    except ValueError:
+                        from tkinter import messagebox
+                        messagebox.showwarning(
+                            "Invalid goal", "Enter a whole number from 1 to 500.", parent=window
+                        )
+                        return
+                    updated = on_save_goal(value)
+                    if updated is not None:
+                        summary.configure(
+                            text=f"Today: {updated.completed_today}/{updated.target} graded reviews"
+                        )
+                        streak.configure(
+                            text=f"Current streak: {updated.current_streak} days    "
+                                 f"Longest: {updated.longest_streak} days"
+                        )
+                        target_value.set(str(updated.target))
+                        progress_fill.place_configure(
+                            width=round(260 * min(1, updated.completed_today / updated.target))
+                        )
+                        completion.configure(
+                            text="Daily goal achieved" if updated.goal_reached
+                            else f"{updated.remaining} reviews to reach today's goal"
+                        )
+
+                self._create_button(
+                    edit_row, "Save Goal", save_goal, width=12, height=1
+                ).pack(side=tk.LEFT, padx=4)
 
         self._create_label(frame, "Graded reviews — last 7 days", 13).pack(
             pady=(16, 7)
