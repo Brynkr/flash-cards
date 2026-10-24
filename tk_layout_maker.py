@@ -332,30 +332,33 @@ class TkLayoutMaker:
         frame = tk.Frame(window, bg=self.bg_color)
         frame.pack(expand=True, fill=tk.BOTH, padx=20, pady=20)
 
-        label = self._create_label(frame, str(key), 18)
-        label.pack(pady=20)
+        label = self._create_label(
+            frame, str(key), 18, wraplength=360, justify=tk.CENTER
+        )
+        label.pack(fill=tk.X, pady=20)
+
+        # Wrap long prompts to the available width when the window is resized.
+        def resize_prompt(event):
+            label.configure(wraplength=max(160, min(760, event.width - 16)))
+
+        frame.bind('<Configure>', resize_prompt)
 
         tk.Label(frame, text="", bg=self.bg_color).pack()
 
         button_frame = tk.Frame(frame, bg=self.bg_color)
-        button_frame.pack(pady=10)
+        button_frame.pack(fill=tk.X, pady=10)
+        for column in range(2):
+            button_frame.columnconfigure(column, weight=1, uniform='study_buttons')
 
         self._create_button(
-            button_frame,
-            constants.BUTTON_ANSWER_TEXT,
-            on_answer,
-            width=40,
-            height=4,
-            focus=True
-        ).pack(side=tk.LEFT, padx=5)
+            button_frame, constants.BUTTON_ANSWER_TEXT, on_answer,
+            width=12, height=2, focus=True,
+        ).grid(row=0, column=0, sticky='ew', padx=5)
 
         self._create_button(
-            button_frame,
-            constants.BUTTON_RETURN_TEXT,
-            on_return,
-            width=16,
-            height=4
-        ).pack(side=tk.LEFT, padx=5)
+            button_frame, constants.BUTTON_RETURN_TEXT, on_return,
+            width=12, height=2,
+        ).grid(row=0, column=1, sticky='ew', padx=5)
 
         # Bind Enter key to answer
         window.bind('<Return>', lambda e: on_answer())
@@ -374,59 +377,43 @@ class TkLayoutMaker:
         frame = tk.Frame(window, bg=self.bg_color)
         frame.pack(expand=True, fill=tk.BOTH, padx=20, pady=20)
 
-        key_label = self._create_label(frame, str(key) + ':', 28)
-        key_label.pack(pady=5)
+        key_label = self._create_label(
+            frame, str(key) + ':', 28, wraplength=360, justify=tk.CENTER
+        )
+        key_label.pack(fill=tk.X, pady=5)
 
-        value_label = self._create_label(frame, str(value), 28, self.yellow_color)
-        value_label.pack(pady=5)
+        value_label = self._create_label(
+            frame, str(value), 28, self.yellow_color,
+            wraplength=360, justify=tk.CENTER,
+        )
+        value_label.pack(fill=tk.X, pady=5)
+
+        # Keep long translations readable when study windows are resized.
+        def resize_translation(event):
+            width = max(160, min(760, event.width - 16))
+            key_label.configure(wraplength=width)
+            value_label.configure(wraplength=width)
+
+        frame.bind('<Configure>', resize_translation)
 
         tk.Label(frame, text="", bg=self.bg_color).pack()
 
         button_frame = tk.Frame(frame, bg=self.bg_color)
-        button_frame.pack(pady=10)
-
-        if priority:
+        button_frame.pack(fill=tk.X, pady=10)
+        actions = (
+            ((constants.BUTTON_NEXT_TEXT, on_next),
+             (constants.BUTTON_RETURN_TEXT, on_return))
+            if priority else
+            ((constants.BUTTON_NEXT_TEXT, on_next),
+             (constants.BUTTON_PRIORITY_TEXT, on_priority),
+             (constants.BUTTON_RETURN_TEXT, on_return))
+        )
+        for column, (text, command) in enumerate(actions):
+            button_frame.columnconfigure(column, weight=1, uniform='study_buttons')
             self._create_button(
-                button_frame,
-                constants.BUTTON_NEXT_TEXT,
-                on_next,
-                width=46,
-                height=4,
-                focus=True
-            ).pack(side=tk.LEFT, padx=5)
-
-            self._create_button(
-                button_frame,
-                constants.BUTTON_RETURN_TEXT,
-                on_return,
-                width=22,
-                height=4
-            ).pack(side=tk.LEFT, padx=5)
-        else:
-            self._create_button(
-                button_frame,
-                constants.BUTTON_NEXT_TEXT,
-                on_next,
-                width=46,
-                height=3,
-                focus=True
-            ).pack(side=tk.LEFT, padx=5)
-
-            self._create_button(
-                button_frame,
-                constants.BUTTON_PRIORITY_TEXT,
-                on_priority,
-                width=8,
-                height=3
-            ).pack(side=tk.LEFT, padx=5)
-
-            self._create_button(
-                button_frame,
-                constants.BUTTON_RETURN_TEXT,
-                on_return,
-                width=8,
-                height=3
-            ).pack(side=tk.LEFT, padx=5)
+                button_frame, text, command,
+                width=12, height=2, focus=(column == 0),
+            ).grid(row=0, column=column, sticky='ew', padx=5)
 
         # Bind Enter key to next
         window.bind('<Return>', lambda e: on_next())
