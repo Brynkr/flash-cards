@@ -19,6 +19,7 @@ class DeckHandler:
 
       self._deck = None
       self.build_deck(card_dir)
+      self._load_saved_priority_cards()
       self._deck.shuffle_all()
 
 
@@ -78,17 +79,52 @@ class DeckHandler:
       self._deck = Deck(card_list)
 
 
+   def _priority_pairs(self, text):
+      """Recognize existing selections, including legacy leading blank lines."""
+      pairs = set()
+      for line in text.splitlines():
+         sides = line.split(constants.CARD_SIDE_DELIMITER, 1)
+         if len(sides) == 2:
+            pairs.add((sides[0].strip(), sides[1].strip()))
+      return pairs
+
+
+   def _include_priorities(self, pairs):
+      """Use the actual deck card objects so Priority Study works immediately."""
+      for card in self._deck.cards:
+         if ((card.english, card.chinese) in pairs and
+               card not in self._deck._priority_cards):
+            self._deck._priority_cards.append(card)
+      self._deck._num_priority_cards = len(self._deck._priority_cards)
+
+
+   def _load_saved_priority_cards(self):
+      """A new installation may have no priority list yet."""
+      from pathlib import Path
+      path = Path(self._priority_card_dir)
+      if path.is_file():
+         self._include_priorities(self._priority_pairs(
+            path.read_text(encoding='utf-8')
+         ))
+
+
    def add_priority_card(self, side_one, side_two):
-      with open(self._priority_card_dir, 'r') as cards:
-         for line in cards:
-            line_list = line.split(constants.CARD_SIDE_DELIMITER)
-            if line_list[constants.ENGLISH_INDEX].strip() == side_one\
-             and line_list[constants.CHINESE_INDEX].strip() == side_two:
-               print("Priority card already exists, skipping.\n")
-               return
-      with open(self._priority_card_dir, 'a') as file:
-         file.write("\n{} {} {}".format(side_one, constants.CARD_SIDE_DELIMITER, side_two))
-         print("Added priority card.\n")
+      """Create the list on first use and keep saved/in-memory priorities synced."""
+      from pathlib import Path
+      path = Path(self._priority_card_dir)
+      path.parent.mkdir(parents=True, exist_ok=True)
+      pair = (side_one, side_two)
+      with path.open('a+', encoding='utf-8') as cards:
+         cards.seek(0)
+         existing = cards.read()
+         if pair in self._priority_pairs(existing):
+            print("Priority card already exists, skipping.\n")
+         else:
+            # Avoid both a leading blank line and joining onto an old last line.
+            gap = '\n' if existing and not existing.endswith(('\n', '\r')) else ''
+            cards.write(f"{gap}{side_one} {constants.CARD_SIDE_DELIMITER} {side_two}\n")
+            print("Added priority card.\n")
+      self._include_priorities({pair})
 
 
    def correct_answer(self, value, input_val):

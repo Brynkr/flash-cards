@@ -698,10 +698,19 @@ class GUI:
         window.wait_window()
 
     def set_window_size(self, window, default_x=520, default_y=380):
+        """Respect each screen's requested size so controls are not clipped."""
         if self._fullscreen:
             window.attributes('-fullscreen', True)
         else:
-            window.geometry(f"{default_x}x{default_y}")
+            # The former fixed sizes clipped buttons on macOS, especially in
+            # Study Recent and Input Study. Calculate the complete layout first.
+            window.update_idletasks()
+            required_width = window.winfo_reqwidth()
+            required_height = window.winfo_reqheight()
+            window.minsize(required_width, required_height)
+            window.geometry(
+                f"{max(default_x, required_width)}x{max(default_y, required_height)}"
+            )
 
     def toggle_fullscreen(self, window):
         self._fullscreen = not self._fullscreen
