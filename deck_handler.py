@@ -1,9 +1,12 @@
 import random
+import logging
 import constants
 from card import Card
 from deck import Deck
 from study_core.answers import answer_matches
 from study_core.legacy_chinese import extract_hanzi_answers
+
+logger = logging.getLogger(__name__)
 
 
 class DeckHandler:
@@ -58,7 +61,7 @@ class DeckHandler:
       card_list = []
       with open(card_dir, 'r') as cards:
          for line in cards:
-            print("\nBuilding Deck. Line = {}".format(line))
+            logger.debug("Building Deck. Line = %s", line.rstrip())
             line = line.strip()
             if line and not line.startswith(constants.COMMENTED_LINE_CHAR):
                split_line = line.split(constants.CARD_SIDE_DELIMITER)
@@ -105,7 +108,7 @@ class DeckHandler:
 
 
    def category_card_filter(self, cards, categories):
-      print("card category filter. categories={}".format(categories))
+      logger.debug("card category filter: %s", categories)
       filtered_cards = []
       filtered_card_english = []
       for card in cards:
@@ -126,7 +129,7 @@ class DeckHandler:
                   filtered_card_english.append(card.english)
                   break
 
-      print("len cards used={} filtered_cards={}".format(len(filtered_card_english), filtered_card_english))
+      logger.debug("filtered %d cards", len(filtered_card_english))
       return filtered_cards
 
 

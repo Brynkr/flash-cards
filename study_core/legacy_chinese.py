@@ -41,3 +41,24 @@ def extract_hanzi_answers(value: str, delimiter: str) -> list[str]:
         if hanzi and hanzi not in answers:
             answers.append(hanzi)
     return answers
+
+
+def extract_pinyin_answers(value: str, delimiter: str) -> list[str]:
+    """Read the non-Hanzi pinyin for each explicitly delimited alternative.
+
+    Does not guess pinyin from Chinese characters or silently change tones.
+    """
+    if not isinstance(value, str) or not isinstance(delimiter, str):
+        raise TypeError("value and delimiter must be strings")
+    if not delimiter:
+        raise ValueError("delimiter must not be empty")
+
+    answers = []
+    for entry in value.split(delimiter):
+        # The legacy format is `pinyin 汉字`. Remove Hanzi but retain tone marks.
+        pinyin = " ".join("".join(
+            " " if _is_hanzi(char) else char for char in entry
+        ).split()).strip()
+        if pinyin and pinyin not in answers:
+            answers.append(pinyin)
+    return answers

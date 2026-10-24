@@ -79,7 +79,6 @@ class Deck:
             if tag not in self._categories:
                self._categories[tag] = False
                
-      print("set categories={}".format(self._categories))
 
 
    @property

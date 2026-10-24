@@ -1,5 +1,6 @@
 import itertools
 import constants
+from study_core.legacy_chinese import extract_hanzi_answers, extract_pinyin_answers
 
 class Card:
    id_iter = itertools.count()
@@ -21,21 +22,25 @@ class Card:
 
 
    def set_pinyin_hanzi(self):
-      hanzi = ""
-      pinyin = ""
-      for val in self._chinese.split(constants.WORD_DELIMITER):
-         val = val.strip()
-         for char in val:
-            if ord(char) >= constants.UNICODE_CHINESE_LOWER_LIMIT\
-                 and ord(char) <= constants.UNICODE_CHINESE_UPPER_LIMIT:
-               hanzi = hanzi + char
-            else:
-               pinyin = pinyin + char
+      """Parse each explicitly separated pronunciation as one alternative.
 
-         self._hanzi = self._hanzi + hanzi.strip() + " "
-         self._pinyin = self._pinyin + pinyin.strip() + " "
+      Keep the original field for display and future data migration. Running
+      this method more than once must never duplicate an answer.
+      """
+      delimiter = constants.WORD_DELIMITER
+      self._hanzi_options = tuple(extract_hanzi_answers(self._chinese, delimiter))
+      self._pinyin_options = tuple(extract_pinyin_answers(self._chinese, delimiter))
+      separator = f" {delimiter.strip()} "
+      self._hanzi = separator.join(self._hanzi_options)
+      self._pinyin = separator.join(self._pinyin_options)
 
-      print("-- set_pinyin_hanzi --\nhanzi={}\npinyin={}".format(self._hanzi, self._pinyin))
+   @property
+   def hanzi_options(self):
+      return self._hanzi_options
+
+   @property
+   def pinyin_options(self):
+      return self._pinyin_options
 
 
    @property
