@@ -353,75 +353,110 @@ class GUI:
         if session_size is not None and not (recent or priority):
             cards = select_session_cards(cards, session_size)
 
-        for card in cards:
-            print(f"front = {card.english}, back = {card.chinese}")
-
-            # Show front of card
-            result = self._show_card_front(card, priority)
-
-            if result == "RETURN":
-                return
-            elif result == "SHOW_BACK":
-                back_result = self._show_card_back(card, priority)
-                if back_result == "RETURN":
+        # Study tests can still stub the existing front/back methods. In the
+        # real UI both methods share one Toplevel, cleaned up exactly once.
+        completed = False
+        try:
+            for card in cards:
+                print(f"front = {card.english}, back = {card.chinese}")
+                result = self._show_card_front(card, priority)
+                if result == "RETURN":
                     return
+                if result == "SHOW_BACK":
+                    back_result = self._show_card_back(card, priority)
+                    if back_result == "RETURN":
+                        return
+            completed = True
+        finally:
+            window = getattr(self, '_visual_study_window', None)
+            self._visual_study_window = None
+            if window is not None:
+                try:
+                    if window.winfo_exists():
+                        window.destroy()
+                except tk.TclError:
+                    pass
 
-        # Show completion message
-        self._show_completion()
+        if completed:
+            self._show_completion()
+
+    def _visual_study_surface(self):
+        """Use one outer Tk window for an entire visual Study session."""
+        window = getattr(self, '_visual_study_window', None)
+        if window is None or not window.winfo_exists():
+            window = tk.Toplevel(self.root)
+            self._visual_study_window = window
+            return window, True
+        return window, False
+
+    def _clear_visual_study_surface(self, window):
+        """Remove widgets and old shortcuts, never the outer study window."""
+        for key in ('<Return>', '<space>', '<Escape>'):
+            window.unbind(key)
+        for child in window.winfo_children():
+            child.destroy()
+
+    def _fit_visual_study_surface(self, window, first_view):
+        """Preserve position and dimensions; grow only for oversized content."""
+        if first_view:
+            # A common size for Q and A avoids the old 520x160 -> 640x210 jump.
+            self.set_window_size(window, 680, 350)
+            return
+        if self._fullscreen:
+            return
+        window.update_idletasks()
+        width = max(window.winfo_width(), window.winfo_reqwidth())
+        height = max(window.winfo_height(), window.winfo_reqheight())
+        if width > window.winfo_width() or height > window.winfo_height():
+            # Geometry without +x+y retains the window's current screen location.
+            window.geometry(f"{width}x{height}")
 
     def _show_card_front(self, card, priority):
-        """Show the front of a flashcard"""
-        window = tk.Toplevel(self.root)
+        """Display Q in the session window, waiting for a user action."""
+        window, first_view = self._visual_study_surface()
+        self._clear_visual_study_surface(window)
         window.title("Q")
-
-        result = {"action": None}
+        action = tk.StringVar(master=window, value="WAIT")
 
         def on_answer():
-            result["action"] = "SHOW_BACK"
-            window.destroy()
+            action.set("SHOW_BACK")
 
         def on_return():
-            result["action"] = "RETURN"
-            window.destroy()
+            action.set("RETURN")
 
+        window.protocol("WM_DELETE_WINDOW", on_return)
         self._layout_maker.create_display_front_layout(
             window, card.english, on_answer, on_return
         )
-
-        self.set_window_size(window, 520, 160)
-        window.wait_window()
-
-        return result["action"]
+        self._fit_visual_study_surface(window, first_view)
+        window.wait_variable(action)
+        return action.get()
 
     def _show_card_back(self, card, priority):
-        """Show the back of a flashcard"""
-        window = tk.Toplevel(self.root)
+        """Replace Q with A; leave the session window exactly where it is."""
+        window, first_view = self._visual_study_surface()
+        self._clear_visual_study_surface(window)
         window.title("A")
-
-        result = {"action": None}
+        action = tk.StringVar(master=window, value="WAIT")
 
         def on_next():
-            result["action"] = "NEXT"
-            window.destroy()
+            action.set("NEXT")
 
         def on_priority():
             self._deck_handler.add_priority_card(card.english, card.chinese)
-            result["action"] = "NEXT"
-            window.destroy()
+            action.set("NEXT")
 
         def on_return():
-            result["action"] = "RETURN"
-            window.destroy()
+            action.set("RETURN")
 
+        window.protocol("WM_DELETE_WINDOW", on_return)
         self._layout_maker.create_display_back_layout(
             window, card.english, card.chinese, priority,
             on_next, on_priority, on_return
         )
-
-        self.set_window_size(window, 640, 210)
-        window.wait_window()
-
-        return result["action"]
+        self._fit_visual_study_surface(window, first_view)
+        window.wait_variable(action)
+        return action.get()
 
     def _show_completion(self):
         """Show completion message"""
