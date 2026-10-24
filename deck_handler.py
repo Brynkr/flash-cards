@@ -2,6 +2,8 @@ import random
 import constants
 from card import Card
 from deck import Deck
+from study_core.answers import answer_matches
+from study_core.legacy_chinese import extract_hanzi_answers
 
 
 class DeckHandler:
@@ -87,23 +89,14 @@ class DeckHandler:
 
 
    def correct_answer(self, value, input_val):
-      print("value={}\ninput_val={}".format(value, input_val))
-      answer = ""
-      value_ary = value.split(constants.WORD_DELIMITER)
-      for val in value_ary:
-         val = val.strip()
-         word_len = len(val.split(" "))
-         if word_len == 2:
-            answer = val[-1:]
-         elif word_len == 3:
-            answer = val[-2:]
-         elif word_len == 4:
-            answer = val[-3:]
-         answer = answer.strip()
-         print("Answer={}".format(answer))
-         if answer == input_val:
-            return True
-      return False
+      """Check Hanzi against each translation explicitly listed on the card."""
+      options = extract_hanzi_answers(value, constants.WORD_DELIMITER)
+      return bool(options) and answer_matches(input_val, options, "zh")
+
+
+   def filter_cards_by_category(self, cards, categories):
+      """Compatibility alias used by tk_gui.py study modes."""
+      return self.category_card_filter(cards, categories)
 
 
    def get_hanzi(self, value):
