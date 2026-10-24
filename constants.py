@@ -1,6 +1,13 @@
-CARD_PATH = "/Users/bryn/Documents/PyProjects/flashcards/cards.txt"
-PRIORITY_CARD_PATH = "/Users/bryn/Documents/PyProjects/flashcards/priority_cards.txt"
-AUDIO_PATH = "/Users/bryn/Documents/PyProjects/flashcards/audio"
+import os
+from pathlib import Path
+
+# By default, store data beside this module. Can be overridden for other devices.
+_PROJECT_DIR = Path(__file__).resolve().parent
+_DATA_DIR = Path(os.environ.get("FLASH_CARDS_DATA_DIR", str(_PROJECT_DIR))).expanduser()
+
+CARD_PATH = str(_DATA_DIR / "cards.txt")
+PRIORITY_CARD_PATH = str(_DATA_DIR / "priority_cards.txt")
+AUDIO_PATH = str(_DATA_DIR / "audio")
 
 GUI_THEME = "DarkTeal2"
 ENGLISH_INDEX = 0
@@ -35,8 +42,8 @@ UNICODE_ALPHABET_LOWERCASE_END = 122
 UNICODE_ALPHABET_UPPERCASE_START = 65
 UNICODE_ALPHABET_UPPERCASE_END = 90
 
-PLAYHT_USER_ID = ""
-PLAYHT_API_KEY = ""
+PLAYHT_USER_ID = os.environ.get("PLAYHT_USER_ID", "")
+PLAYHT_API_KEY = os.environ.get("PLAYHT_API_KEY", "")
 PLAYHT_API_URL = "https://api.play.ht/api/v2/tts/stream"
 PLAYHT_CHINESE_VOICE = "s3://voice-cloning-zero-shot/0de4c615-277c-43dd-b624-cae756d44582/cn-voice1/manifest.json"
 PLAYHT_ENGLISH_VOICE = "s3://voice-cloning-zero-shot/028a32d4-6a79-4ca3-a303-d6559843114b/chris/manifest.json"

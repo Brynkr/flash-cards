@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.venv/
+audio/
+priority_cards.txt
+flashcards.db
+flashcards.db-*
