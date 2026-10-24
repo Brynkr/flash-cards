@@ -359,6 +359,12 @@ class TkLayoutMaker:
 
         # Bind Enter key to answer
         window.bind('<Return>', lambda e: on_answer())
+        window.bind(
+            '<space>',
+            lambda e: on_answer() if e.widget.winfo_class() not in
+            ('Button', 'TButton') else None,
+        )
+        window.bind('<Escape>', lambda e: on_return())
 
     def create_display_back_layout(self, window, key, value, priority,
                                    on_next, on_priority, on_return):
@@ -424,6 +430,12 @@ class TkLayoutMaker:
 
         # Bind Enter key to next
         window.bind('<Return>', lambda e: on_next())
+        window.bind(
+            '<space>',
+            lambda e: on_next() if e.widget.winfo_class() not in
+            ('Button', 'TButton') else None,
+        )
+        window.bind('<Escape>', lambda e: on_return())
 
     def create_input_front_layout(self, window, key, on_answer, on_return, on_input_change):
         """Create input study front layout"""
