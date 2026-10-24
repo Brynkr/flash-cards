@@ -471,13 +471,16 @@ class GUI:
     def input_study(self):
         cards = self._deck_handler.filter_cards_by_category(self._deck_handler.cards, self._categories)
 
-        for card in cards:
-            print(f"front = {card.english}, back = {card.chinese}")
+        try:
+            for card in cards:
+                print(f"front = {card.english}, back = {card.chinese}")
 
-            result = self._input_answer_poll(card)
+                result = self._input_answer_poll(card)
 
-            if result == constants.BUTTON_RETURN_TEXT:
-                return
+                if result == constants.BUTTON_RETURN_TEXT:
+                    return
+        finally:
+            self._close_input_study_surface()
 
         self._show_completion()
 
@@ -535,10 +538,13 @@ class GUI:
             )
             return
 
-        for card in selected:
-            result = self._input_answer_poll(card)
-            if result is None or result == constants.BUTTON_RETURN_TEXT:
-                return
+        try:
+            for card in selected:
+                result = self._input_answer_poll(card)
+                if result is None or result == constants.BUTTON_RETURN_TEXT:
+                    return
+        finally:
+            self._close_input_study_surface()
 
         self._show_completion()
 
@@ -582,72 +588,135 @@ class GUI:
             self._review_history = ReviewHistory()
         self._review_history.record_review(card.english, card.chinese, correct, mode="input")
 
+    def _input_study_surface(self):
+        """Return the shared Input Study/Review Due window (create it once)."""
+        window = getattr(self, '_input_study_window', None)
+        if window is None or not window.winfo_exists():
+            window = tk.Toplevel(self.root)
+            self._input_study_window = window
+            return window, True
+        return window, False
+
+    def _clear_input_study_surface(self, window):
+        """Remove a previous question/feedback view but retain its window."""
+        for key in ('<Return>', '<Escape>', '<space>'):
+            window.unbind(key)
+        for child in window.winfo_children():
+            child.destroy()
+
+    def _fit_input_study_surface(self, window, first_view):
+        """Start at a common Q/feedback size; never shrink or move."""
+        if first_view:
+            self.set_window_size(window, 700, 350)
+        elif not self._fullscreen:
+            window.update_idletasks()
+            width = max(window.winfo_width(), window.winfo_reqwidth())
+            height = max(window.winfo_height(), window.winfo_reqheight())
+            if width > window.winfo_width() or height > window.winfo_height():
+                window.geometry(f"{width}x{height}")
+
+    def _close_input_study_surface(self):
+        """Close shared Input Study window on completion, Return, or exception."""
+        window = getattr(self, '_input_study_window', None)
+        self._input_study_window = None
+        if window is not None:
+            try:
+                if window.winfo_exists():
+                    window.destroy()
+            except tk.TclError:
+                pass
+
     def _input_answer_poll(self, card):
-        """Poll for input answer"""
-        window = tk.Toplevel(self.root)
+        """Grade a submitted answer once, using the same window for feedback."""
+        window, first_view = self._input_study_surface()
+        self._clear_input_study_surface(window)
         window.title("Q")
 
         result = {"action": None}
         user_input = {"value": ""}
+        action = tk.StringVar(master=window, value="WAIT")
 
         def on_answer():
             if result["action"] is not None:
-                return  # Ignore a second click on the same answer.
+                return  # Prevent duplicate grading from double-click/Enter.
             correct = self._deck_handler.correct_answer(card.chinese, user_input["value"])
             result["action"] = "Correct" if correct else "Incorrect"
             try:
                 self._record_input_review(card, correct)
             except (sqlite3.Error, OSError, RuntimeError) as error:
-                # A database problem should not trap the user in the study window.
                 messagebox.showwarning(
                     "Review not saved",
                     f"Answer checked, but the review was not saved:\n{error}",
                     parent=window,
                 )
-            window.destroy()
-            if correct:
-                self._show_correct_answer(card)
-            else:
-                self._show_incorrect_answer(card)
+            action.set(result["action"])
 
         def on_return():
-            result["action"] = constants.BUTTON_RETURN_TEXT
-            window.destroy()
+            if result["action"] is None:
+                result["action"] = constants.BUTTON_RETURN_TEXT
+                action.set(result["action"])
 
         def on_input_change(value):
             user_input["value"] = value
 
+        window.protocol("WM_DELETE_WINDOW", on_return)
         self._layout_maker.create_input_front_layout(
             window, card.english, on_answer, on_return, on_input_change
         )
+        self._fit_input_study_surface(window, first_view)
+        window.wait_variable(action)
 
-        self.set_window_size(window, 260, 150)
-        window.wait_window()
-
+        if result["action"] in ("Correct", "Incorrect"):
+            if result["action"] == "Correct":
+                feedback_action = self._show_correct_answer(card)
+            else:
+                feedback_action = self._show_incorrect_answer(card)
+            if feedback_action == "RETURN":
+                return constants.BUTTON_RETURN_TEXT
         return result["action"]
 
-    def _show_correct_answer(self, card):
-        """Show correct answer feedback"""
-        window = tk.Toplevel(self.root)
+    def _show_input_feedback(self, card, correct):
+        """Show timed feedback in the *same* Tk window, with safe cancellation."""
+        window, first_view = self._input_study_surface()
+        self._clear_input_study_surface(window)
         window.title("A")
+        state = tk.StringVar(master=window, value="WAIT")
 
-        self._layout_maker.create_input_back_layout(window, card.english, card.chinese)
+        def on_return():
+            state.set("RETURN")
 
-        self.set_window_size(window, 280, 220)
+        window.protocol("WM_DELETE_WINDOW", on_return)
+        window.bind('<Escape>', lambda event: on_return())
+        if correct:
+            self._layout_maker.create_input_back_layout(
+                window, card.english, card.chinese
+            )
+        else:
+            self._layout_maker.create_incorrect_layout(
+                window, card.english, card.chinese
+            )
+        self._fit_input_study_surface(window, first_view)
 
-        self.root.after(int(constants.ANSWER_DISPLAY_DELAY_SEC * 1000), window.destroy)
-        window.wait_window()
+        timer = window.after(
+            max(1, int(constants.ANSWER_DISPLAY_DELAY_SEC * 1000)),
+            lambda: state.set("NEXT"),
+        )
+        try:
+            window.wait_variable(state)
+        finally:
+            try:
+                window.after_cancel(timer)
+            except tk.TclError:
+                pass
+        return state.get()
+
+    def _show_correct_answer(self, card):
+        """Display correct feedback without creating a separate window."""
+        return self._show_input_feedback(card, correct=True)
 
     def _show_incorrect_answer(self, card):
-        """Show incorrect answer feedback"""
-        window = tk.Toplevel(self.root)
-        window.title("Q")
-
-        self._layout_maker.create_incorrect_layout(window, card.english, card.chinese)
-
-        self.set_window_size(window, 640, 220)
-        self.root.after(int(constants.ANSWER_DISPLAY_DELAY_SEC * 1000), window.destroy)
-        window.wait_window()
+        """Display incorrect feedback without creating a separate window."""
+        return self._show_input_feedback(card, correct=False)
 
     def auto_study(self, priority=False):
         """Cycle flashcards with an interruptible timer and visible controls."""
