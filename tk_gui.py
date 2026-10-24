@@ -7,6 +7,7 @@ import constants
 from deck_handler import DeckHandler
 from tk_layout_maker import TkLayoutMaker
 from study_core.history import ReviewHistory
+from study_core.sessions import choose_study_size, select_session_cards
 import os
 from study_core.scheduler import prioritized_due_cards
 from study_core.adaptive import adaptive_due_cards
@@ -112,7 +113,10 @@ class GUI:
 
             match action:
                 case self.MENU_STUDY:
-                    self.display_study()
+                    # Ask only for regular Study; other study modes stay unchanged.
+                    selection = choose_study_size(self.root)
+                    if selection is not None:
+                        self.display_study(session_size=selection)
                 case self.MENU_STUDY_RECENT:
                     self.display_study(recent=True)
                 case self.MENU_PRIORITY_STUDY:
@@ -329,7 +333,7 @@ class GUI:
         """Handle window close event"""
         sys.exit()
 
-    def display_study(self, recent=False, priority=False):
+    def display_study(self, recent=False, priority=False, session_size=None):
         if recent:
             cards = self._deck_handler.filter_cards_by_category(self._deck_handler.recent_cards,
                                                                 self._categories)
@@ -339,6 +343,9 @@ class GUI:
         else:
             cards = self._deck_handler.filter_cards_by_category(self._deck_handler.cards,
                                                                 self._categories)
+
+        if session_size is not None and not (recent or priority):
+            cards = select_session_cards(cards, session_size)
 
         for card in cards:
             print(f"front = {card.english}, back = {card.chinese}")
