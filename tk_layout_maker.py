@@ -1,18 +1,26 @@
 import tkinter as tk
+import sys
 from tkinter import ttk
 import constants
+
+
+def _mac_buttons_need_overlay():
+    # Native Aqua tk.Button ignores -background; draw a coloured face above it.
+    return sys.platform == 'darwin'
 
 
 class TkLayoutMaker:
 
     def __init__(self):
         # Theme colors
-        self.bg_color = "#2b2b2b"
-        self.fg_color = "#ffffff"
-        self.button_bg = "#404040"
-        self.yellow_color = "#ffff00"
-        self.green_color = "#00ff00"
-        self.red_color = "#ff0000"
+        self.bg_color = "#F4F6FA"
+        self.fg_color = "#17212B"
+        self.button_bg = "#DEE5EE"
+        self.entry_bg = "#FFFFFF"
+        self.button_active_bg = "#CBD6E5"
+        self.yellow_color = "#895000"
+        self.green_color = "#116239"
+        self.red_color = "#A61B1B"
 
     def _create_button(self, parent, text, command, width=12, height=2, focus=False):
         """Create a styled button"""
@@ -22,12 +30,31 @@ class TkLayoutMaker:
             command=command,
             bg=self.button_bg,
             fg=self.fg_color,
+            activebackground=self.button_active_bg,
+            activeforeground=self.fg_color,
             font=('Arial', 10),
             width=width,
             height=height,
             relief=tk.RAISED,
             borderwidth=2
         )
+        if _mac_buttons_need_overlay():
+            # Aqua accepts bg= but paints the native white face regardless.
+            # A Label inside the real Button is rendered with our chosen colour.
+            # Retain the native button for keyboard access and .invoke().
+            face = tk.Label(
+                btn, text=text, bg=self.button_bg, fg=self.fg_color,
+                font=('Arial', 10), relief=tk.RAISED, borderwidth=1,
+                cursor='hand2', takefocus=0,
+            )
+            face.place(x=2, y=2, relwidth=1, relheight=1, width=-4, height=-4)
+            face.bind('<Enter>', lambda event: face.configure(bg=self.button_active_bg))
+            face.bind('<Leave>', lambda event: face.configure(bg=self.button_bg))
+            face.bind('<ButtonPress-1>', lambda event: face.configure(bg=self.button_active_bg))
+            face.bind('<ButtonRelease-1>', lambda event: btn.invoke()
+                      if face.winfo_containing(event.x_root, event.y_root) == face
+                      else None)
+            btn._coloured_face = face  # Keep the visible face accessible for tests.
         if focus:
             btn.focus_set()
         return btn
@@ -57,9 +84,27 @@ class TkLayoutMaker:
         btn = self._create_button(frame, "Complete", on_complete, width=15, height=2)
         btn.pack(pady=10)
 
-    def create_start_layout(self, window, card_count, on_menu_selection):
-        """Create start menu layout"""
+    def create_start_layout(self, window, card_count, on_menu_selection,
+                            on_background=None, on_buttons=None):
+        """Create start menu with small stacked appearance controls on the right."""
         window.configure(bg=self.bg_color)
+
+        if on_background is not None or on_buttons is not None:
+            top_bar = tk.Frame(window, bg=self.bg_color)
+            top_bar.pack(side=tk.TOP, fill=tk.X, padx=12, pady=(5, 0))
+            controls = tk.Frame(top_bar, bg=self.bg_color)
+            controls.pack(side=tk.RIGHT)
+            for label, callback in (("Background", on_background),
+                                    ("Buttons", on_buttons)):
+                if callback is None:
+                    continue
+                row = tk.Frame(controls, bg=self.bg_color)
+                row.pack(side=tk.TOP, fill=tk.X, pady=1)
+                picker = self._create_button(
+                    row, label, callback, width=10, height=1
+                )
+                picker.configure(font=('Arial', 9), borderwidth=1)
+                picker.pack(side=tk.RIGHT)
 
         main_frame = tk.Frame(window, bg=self.bg_color)
         main_frame.pack(expand=True, fill=tk.BOTH, padx=20, pady=20)
@@ -112,6 +157,14 @@ class TkLayoutMaker:
         self._create_button(
             row2, "Auto Priority",
             lambda: on_menu_selection("Auto Priority")
+        ).pack(side=tk.LEFT, padx=5)
+
+        # Review Due is an independent typed-answer mode.
+        review_row = tk.Frame(main_frame, bg=self.bg_color)
+        review_row.pack(pady=5)
+        self._create_button(
+            review_row, "Review Due",
+            lambda: on_menu_selection("Review Due"), width=20
         ).pack(side=tk.LEFT, padx=5)
 
         # Spacer
@@ -269,7 +322,7 @@ class TkLayoutMaker:
             frame,
             width=40,
             font=('Arial', 12),
-            bg='#404040',
+            bg=self.entry_bg,
             fg=self.fg_color,
             insertbackground=self.fg_color
         )
@@ -300,6 +353,7 @@ class TkLayoutMaker:
 
         # Bind Enter key to answer
         window.bind('<Return>', lambda e: on_answer())
+        window.bind('<Escape>', lambda e: on_return())
 
     def create_input_back_layout(self, window, key, value):
         """Create input study back layout (correct answer)"""
@@ -360,7 +414,7 @@ class TkLayoutMaker:
         ).pack(pady=(0, 6))
 
         entry = tk.Entry(frame, width=55, font=('Arial', 12),
-                         bg=self.button_bg, fg=self.fg_color,
+                         bg=self.entry_bg, fg=self.fg_color,
                          insertbackground=self.fg_color)
         entry.pack(pady=6, fill=tk.X)
         entry.focus_set()

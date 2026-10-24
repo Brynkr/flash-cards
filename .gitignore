@@ -8,3 +8,6 @@ audio/
 priority_cards.txt
 flashcards.db
 flashcards.db-*
+
+# Local GUI background preference
+.flashcards-appearance.json

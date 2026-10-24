@@ -1,11 +1,18 @@
 import sys
 import time
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, colorchooser
+from pathlib import Path
 import constants
 from deck_handler import DeckHandler
 from tk_layout_maker import TkLayoutMaker
 from study_core.history import ReviewHistory
+from study_core.scheduler import due_cards
+from study_core.appearance import (
+    BACKGROUND_PRESETS, BUTTON_PRESETS, is_readable_background,
+    is_readable_button, load_background, load_buttons, active_button_color,
+    preference_path, save_background, save_buttons,
+)
 import sqlite3
 import threading
 
@@ -15,6 +22,7 @@ class GUI:
     MENU_STUDY_RECENT = "Study Recent (100)"
     MENU_PRIORITY_STUDY = "Priority Study"
     MENU_INPUT_STUDY = "Input Study"
+    MENU_REVIEW_DUE = "Review Due"
     MENU_AUTO_STUDY = "Auto"
     MENU_AUTO_PRIORITY_STUDY = "Auto Priority"
     MENU_ADD_CARDS = "Add Cards"
@@ -26,6 +34,12 @@ class GUI:
     def __init__(self):
         self._deck_handler  = DeckHandler()
         self._layout_maker  = TkLayoutMaker()
+        self._appearance_path = preference_path(constants.CARD_PATH)
+        self._layout_maker.bg_color = load_background(self._appearance_path)
+        self._layout_maker.button_bg = load_buttons(self._appearance_path)
+        self._layout_maker.button_active_bg = active_button_color(
+            self._layout_maker.button_bg
+        )
         self._review_history = None  # Open the database only after a submitted answer.
 
         self._fullscreen = False
@@ -43,19 +57,21 @@ class GUI:
         self.current_window = None
 
     def _apply_theme(self):
-        """Apply a dark theme"""
-        bg_color = "#2b2b2b"
-        fg_color = "#2c5059"
-        button_bg = "#e60e0e"
+        """Use the same high-contrast light palette as the Tk widgets."""
+        layout = self._layout_maker
+        self.root.configure(bg=layout.bg_color)
 
-        self.root.configure(bg=bg_color)
-
-        style = ttk.Style()
+        style = ttk.Style(self.root)
         style.theme_use('clam')
-        style.configure('TButton', background=button_bg, foreground=fg_color,
+        style.configure('TButton', background=layout.button_bg,
+                        foreground=layout.fg_color,
                         borderwidth=1, font=('Arial', 10))
-        style.configure('TLabel', background=bg_color, foreground=fg_color)
-        style.configure('TFrame', background=bg_color)
+        style.map('TButton',
+                  background=[('active', layout.button_active_bg)],
+                  foreground=[('active', layout.fg_color)])
+        style.configure('TLabel', background=layout.bg_color,
+                        foreground=layout.fg_color)
+        style.configure('TFrame', background=layout.bg_color)
 
     def start_menu(self):
         while True:
@@ -72,10 +88,12 @@ class GUI:
             self._layout_maker.create_start_layout(
                 self.current_window,
                 len(self._deck_handler.cards),
-                self._on_menu_selection
+                self._on_menu_selection,
+                self._pick_background,
+                self._pick_buttons,
             )
 
-            self.set_window_size(self.current_window, 420, 380)
+            self.set_window_size(self.current_window, 420, 495)
 
             # Wait for window to close
             self.current_window.wait_window()
@@ -96,6 +114,8 @@ class GUI:
                     self.display_study(priority=True)
                 case self.MENU_INPUT_STUDY:
                     self.input_study()
+                case self.MENU_REVIEW_DUE:
+                    self.review_due()
                 case self.MENU_AUTO_STUDY:
                     self.auto_study()
                 case self.MENU_AUTO_PRIORITY_STUDY:
@@ -107,9 +127,188 @@ class GUI:
                 case self.MENU_EXIT | _:
                     break
 
+    def _set_background_colour(self, colour):
+        """Apply an accessible colour, save it, and redraw the current menu."""
+        if not is_readable_background(colour):
+            messagebox.showwarning(
+                "Unreadable background",
+                "Please choose a lighter background so all text stays readable.",
+                parent=self.current_window,
+            )
+            return False
+
+        self._layout_maker.bg_color = colour.upper()
+        self._apply_theme()
+        try:
+            save_background(self._appearance_path, colour)
+        except OSError as error:
+            messagebox.showwarning(
+                "Background not saved",
+                f"Colour changed for this session, but it could not be saved:\n{error}",
+                parent=self.current_window,
+            )
+
+        if self.current_window is not None and self.current_window.winfo_exists():
+            for child in self.current_window.winfo_children():
+                # Keep the palette popup alive until its callback closes it.
+                if not isinstance(child, tk.Toplevel):
+                    child.destroy()
+            self._layout_maker.create_start_layout(
+                self.current_window,
+                len(self._deck_handler.cards),
+                self._on_menu_selection,
+                self._pick_background,
+                self._pick_buttons,
+            )
+        return True
+
+    def _set_button_colour(self, colour):
+        """Persist a readable button colour and redraw the active main menu."""
+        if not is_readable_button(colour):
+            messagebox.showwarning(
+                "Unreadable buttons",
+                "Choose a lighter button colour so the labels stay readable.",
+                parent=self.current_window,
+            )
+            return False
+
+        self._layout_maker.button_bg = colour.upper()
+        self._layout_maker.button_active_bg = active_button_color(colour)
+        self._apply_theme()
+        try:
+            save_buttons(self._appearance_path, colour)
+        except OSError as error:
+            messagebox.showwarning(
+                "Button colour not saved",
+                f"Colour changed for this session, but could not be saved:\n{error}",
+                parent=self.current_window,
+            )
+
+        if self.current_window is not None and self.current_window.winfo_exists():
+            for child in self.current_window.winfo_children():
+                if not isinstance(child, tk.Toplevel):
+                    child.destroy()
+            self._layout_maker.create_start_layout(
+                self.current_window, len(self._deck_handler.cards),
+                self._on_menu_selection, self._pick_background,
+                self._pick_buttons,
+            )
+        return True
+
+    def _pick_buttons(self):
+        """Show twelve button colours and an optional custom-colour picker."""
+        menu = self.current_window
+        if menu is None or not menu.winfo_exists():
+            return
+        popup = tk.Toplevel(menu)
+        popup.title("Choose button colour")
+        popup.configure(bg=self._layout_maker.bg_color)
+        popup.transient(menu)
+        popup.resizable(False, False)
+        frame = tk.Frame(popup, bg=self._layout_maker.bg_color)
+        frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=12)
+        self._layout_maker._create_label(frame, "Button colour", 14).pack(pady=(0, 6))
+
+        def select(colour):
+            if self._set_button_colour(colour):
+                popup.destroy()
+
+        for index in range(0, len(BUTTON_PRESETS), 2):
+            row = tk.Frame(frame, bg=self._layout_maker.bg_color)
+            row.pack(fill=tk.X, pady=3)
+            for name, colour in BUTTON_PRESETS[index:index + 2]:
+                choice = tk.Frame(row, bg=self._layout_maker.bg_color)
+                choice.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=4)
+                tk.Label(choice, text="  ", width=2, bg=colour,
+                         relief=tk.SOLID, borderwidth=1).pack(side=tk.LEFT, padx=(0, 6))
+                button = self._layout_maker._create_button(
+                    choice, name, lambda value=colour: select(value),
+                    width=15, height=1,
+                )
+                button.pack(side=tk.LEFT, fill=tk.X, expand=True)
+
+        def custom_colour():
+            result = colorchooser.askcolor(
+                color=self._layout_maker.button_bg, parent=popup,
+                title="Choose a light button colour",
+            )
+            if result and result[1]:
+                select(result[1])
+
+        self._layout_maker._create_button(
+            frame, "Custom colour…", custom_colour, width=19, height=1
+        ).pack(pady=(11, 3))
+        self._layout_maker._create_button(
+            frame, "Cancel", popup.destroy, width=12, height=1
+        ).pack()
+        popup.grab_set()
+        popup.focus_set()
+
+    def _pick_background(self):
+        """Show a small popup of gentle colours, plus a native custom picker."""
+        menu = self.current_window
+        if menu is None or not menu.winfo_exists():
+            return
+        popup = tk.Toplevel(menu)
+        popup.title("Choose background colour")
+        popup.configure(bg=self._layout_maker.bg_color)
+        popup.transient(menu)
+        popup.resizable(False, False)
+
+        frame = tk.Frame(popup, bg=self._layout_maker.bg_color)
+        frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=12)
+        self._layout_maker._create_label(
+            frame, "Background colour", 14
+        ).pack(pady=(0, 6))
+
+        def select(colour):
+            if self._set_background_colour(colour):
+                popup.destroy()
+
+        # Two columns keep all twelve choices visible on a laptop screen.
+        for index in range(0, len(BACKGROUND_PRESETS), 2):
+            row = tk.Frame(frame, bg=self._layout_maker.bg_color)
+            row.pack(fill=tk.X, pady=3)
+            for name, colour in BACKGROUND_PRESETS[index:index + 2]:
+                choice = tk.Frame(row, bg=self._layout_maker.bg_color)
+                choice.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=4)
+                tk.Label(choice, text="  ", width=2, bg=colour,
+                         relief=tk.SOLID, borderwidth=1).pack(
+                             side=tk.LEFT, padx=(0, 6)
+                         )
+                button = self._layout_maker._create_button(
+                    choice, name, lambda value=colour: select(value),
+                    width=15, height=1,
+                )
+                button.pack(side=tk.LEFT, fill=tk.X, expand=True)
+
+        def custom_colour():
+            result = colorchooser.askcolor(
+                color=self._layout_maker.bg_color,
+                parent=popup,
+                title="Choose a light background",
+            )
+            if result and result[1]:
+                select(result[1])
+
+        self._layout_maker._create_button(
+            frame, "Custom colour…", custom_colour, width=19, height=1
+        ).pack(pady=(11, 3))
+        self._layout_maker._create_button(
+            frame, "Cancel", popup.destroy, width=12, height=1
+        ).pack()
+        popup.grab_set()
+        popup.focus_set()
+
     def _on_menu_selection(self, action):
         """Callback for menu button clicks"""
         match action:
+            case "Generate Audio":
+                messagebox.showinfo(
+                    "Audio generation",
+                    "Audio generation is not yet available in this Tkinter interface.",
+                    parent=self.current_window,
+                )
             case self.MENU_FULLSCREEN:
                 self.toggle_fullscreen(self.current_window)
             case self.MENU_TOGGLE_AUDIO:
@@ -223,6 +422,40 @@ class GUI:
             result = self._input_answer_poll(card)
 
             if result == constants.BUTTON_RETURN_TEXT:
+                return
+
+        self._show_completion()
+
+    def review_due(self):
+        """Study due cards once, respecting active categories and using typed answers.
+
+        A wrong card is due again at the next session, not repeated endlessly in
+        this one. Viewing, returning, and selection do not record reviews.
+        """
+        cards = self._deck_handler.filter_cards_by_category(
+            self._deck_handler.cards, self._categories
+        )
+        try:
+            if self._review_history is None:
+                self._review_history = ReviewHistory()
+            selected = due_cards(cards, self._review_history)
+        except (sqlite3.Error, OSError, RuntimeError) as error:
+            messagebox.showwarning(
+                "Review unavailable", f"Could not load due cards:\n{error}",
+                parent=self.root,
+            )
+            return
+
+        if not selected:
+            messagebox.showinfo(
+                "All caught up", "No flashcards are due in the selected categories.",
+                parent=self.root,
+            )
+            return
+
+        for card in selected:
+            result = self._input_answer_poll(card)
+            if result is None or result == constants.BUTTON_RETURN_TEXT:
                 return
 
         self._show_completion()
