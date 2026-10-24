@@ -389,18 +389,36 @@ class TkLayoutMaker:
         value_label = self._create_label(answer_frame, str(value), 28, self.yellow_color)
         value_label.pack(side=tk.LEFT, padx=5)
 
-    def create_auto_layout(self, window, key, value):
-        """Create auto study layout"""
+    def create_auto_layout(self, window, key, value, on_pause_resume=None,
+                           on_stop=None, on_return=None):
+        """Create Auto Study display, optionally with playback controls."""
         window.configure(bg=self.bg_color)
-
         frame = tk.Frame(window, bg=self.bg_color)
-        frame.pack(expand=True, fill=tk.BOTH, padx=20, pady=20)
+        frame.pack(expand=True, fill=tk.BOTH, padx=20, pady=12)
 
-        key_label = self._create_label(frame, str(key) + ':', 28)
-        key_label.pack(pady=5)
+        self._create_label(frame, str(key) + ':', 28).pack(pady=5)
+        self._create_label(frame, str(value), 28, self.yellow_color).pack(pady=5)
 
-        value_label = self._create_label(frame, str(value), 28, self.yellow_color)
-        value_label.pack(pady=5)
+        if not all((on_pause_resume, on_stop, on_return)):
+            return None  # Compatible with existing display-only callers.
+
+        status = self._create_label(frame, "Playing", 11)
+        status.pack(pady=(5, 0))
+        row = tk.Frame(frame, bg=self.bg_color)
+        row.pack(pady=(7, 0))
+        pause = self._create_button(
+            row, "Pause", on_pause_resume, width=12, height=1
+        )
+        pause.pack(side=tk.LEFT, padx=5)
+        stop = self._create_button(
+            row, "Stop", on_stop, width=12, height=1
+        )
+        stop.pack(side=tk.LEFT, padx=5)
+        back = self._create_button(
+            row, "Return to Menu", on_return, width=16, height=1
+        )
+        back.pack(side=tk.LEFT, padx=5)
+        return {"pause": pause, "stop": stop, "return": back, "status": status}
 
     def create_add_cards_layout(self, window, on_add, on_return, on_input_change, status):
         """Add vocabulary with a visible input and validation feedback."""

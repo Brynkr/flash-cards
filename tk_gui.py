@@ -534,31 +534,93 @@ class GUI:
         window.wait_window()
 
     def auto_study(self, priority=False):
+        """Cycle flashcards with an interruptible timer and visible controls."""
         while True:
             self._deck_handler.shuffle_deck()
-
-            if priority:
-                cards = self._deck_handler.filter_cards_by_category(
-                    self._deck_handler.priority_cards, self._categories
-                )
-            else:
-                cards = self._deck_handler.filter_cards_by_category(
-                    self._deck_handler.cards, self._categories
-                )
+            source = (self._deck_handler.priority_cards if priority
+                      else self._deck_handler.cards)
+            cards = self._deck_handler.filter_cards_by_category(
+                source, self._categories
+            )
+            if not cards:
+                messagebox.showinfo("Auto Study", "No cards match the selected categories.")
+                return
 
             for card in cards:
-                print(f"front = {card.english}, back = {card.chinese}")
-
                 window = tk.Toplevel(self.root)
-                window.title("Q")
-                window.geometry("+950+700")
+                window.title("Auto Study")
+                state = {
+                    "action": None, "paused": False, "stopped": False,
+                    "remaining": max(0.0, float(constants.AUTO_DISPLAY_DELAY_SEC)),
+                    "started": None, "timeout": None,
+                }
 
-                self._layout_maker.create_auto_layout(window, card.english, card.chinese)
+                def cancel_timeout():
+                    if state["timeout"] is not None:
+                        window.after_cancel(state["timeout"])
+                        state["timeout"] = None
 
-                self.set_window_size(window, 320, 120)
+                def advance():
+                    state["timeout"] = None
+                    if not state["paused"] and not state["stopped"]:
+                        state["action"] = "NEXT"
+                        window.destroy()
 
-                self.root.after(int(constants.AUTO_DISPLAY_DELAY_SEC * 1000), window.destroy)
+                def schedule():
+                    state["started"] = time.monotonic()
+                    state["timeout"] = window.after(
+                        max(1, round(state["remaining"] * 1000)), advance
+                    )
+
+                def set_pause_label(text):
+                    button = controls["pause"]
+                    button.configure(text=text)
+                    if hasattr(button, "_coloured_face"):
+                        button._coloured_face.configure(text=text)
+
+                def pause_resume():
+                    if state["stopped"]:
+                        return
+                    if state["paused"]:
+                        state["paused"] = False
+                        controls["status"].configure(text="Playing")
+                        set_pause_label("Pause")
+                        schedule()
+                    else:
+                        state["paused"] = True
+                        state["remaining"] = max(
+                            0.0, state["remaining"] -
+                            (time.monotonic() - state["started"])
+                        )
+                        cancel_timeout()
+                        controls["status"].configure(text="Paused")
+                        set_pause_label("Resume")
+
+                def stop():
+                    state["stopped"] = True
+                    cancel_timeout()
+                    controls["pause"].configure(state="disabled")
+                    controls["stop"].configure(state="disabled")
+                    controls["status"].configure(
+                        text="Stopped — select Return to Menu"
+                    )
+
+                def return_to_menu():
+                    state["action"] = "RETURN"
+                    cancel_timeout()
+                    window.destroy()
+
+                controls = self._layout_maker.create_auto_layout(
+                    window, card.english, card.chinese,
+                    on_pause_resume=pause_resume, on_stop=stop,
+                    on_return=return_to_menu,
+                )
+                self.set_window_size(window, 520, 260)
+                window.protocol("WM_DELETE_WINDOW", return_to_menu)
+                schedule()
                 window.wait_window()
+                if state["action"] != "NEXT":
+                    return
 
     def add_cards(self):
         window = tk.Toplevel(self.root)
