@@ -171,8 +171,14 @@ class TkLayoutMaker:
             lambda: on_menu_selection("Progress"), width=18
         ).pack(side=tk.LEFT, padx=5)
 
-        # Spacer
-        tk.Frame(main_frame, bg=self.bg_color, height=20).pack()
+        # Keep learning activities separate from card-management and settings.
+        section_divider = tk.Frame(
+            main_frame, bg=self.button_bg, height=2,
+        )
+        section_divider.pack(fill=tk.X, padx=22, pady=(16, 9))
+        self._create_label(
+            main_frame, "Library & Settings", 12,
+        ).pack(pady=(0, 9))
 
         # Third row of buttons
         row3 = tk.Frame(main_frame, bg=self.bg_color)
@@ -359,12 +365,12 @@ class TkLayoutMaker:
 
         self._create_button(
             button_frame, constants.BUTTON_ANSWER_TEXT, on_answer,
-            width=12, height=2, focus=True,
+            width=14, height=3, focus=True,
         ).grid(row=0, column=0, sticky='ew', padx=5)
 
         self._create_button(
             button_frame, constants.BUTTON_RETURN_TEXT, on_return,
-            width=12, height=2,
+            width=14, height=3,
         ).grid(row=0, column=1, sticky='ew', padx=5)
 
         # Bind Enter key to answer
@@ -419,7 +425,7 @@ class TkLayoutMaker:
             button_frame.columnconfigure(column, weight=1, uniform='study_buttons')
             self._create_button(
                 button_frame, text, command,
-                width=12, height=2, focus=(column == 0),
+                width=14, height=3, focus=(column == 0),
             ).grid(row=0, column=column, sticky='ew', padx=5)
 
         # Bind Enter key to next
@@ -462,16 +468,16 @@ class TkLayoutMaker:
             button_frame,
             constants.BUTTON_ANSWER_TEXT,
             on_answer,
-            width=7,
-            height=3
+            width=10,
+            height=4
         ).pack(side=tk.LEFT, padx=5)
 
         self._create_button(
             button_frame,
             constants.BUTTON_RETURN_TEXT,
             on_return,
-            width=7,
-            height=3
+            width=10,
+            height=4
         ).pack(side=tk.LEFT, padx=5)
 
         # Bind Enter key to answer
@@ -512,6 +518,37 @@ class TkLayoutMaker:
         value_label = self._create_label(answer_frame, str(value), 28, self.yellow_color)
         value_label.pack(side=tk.LEFT, padx=5)
 
+    def create_auto_speed_controls(self, window, seconds, *,
+                                   on_faster, on_slower):
+        """Compact speed buttons: minus = faster, plus = slower."""
+        bar = tk.Frame(window, bg=self.bg_color)
+        bar.pack(side=tk.BOTTOM, fill=tk.X, padx=16, pady=(0, 12))
+        controls = tk.Frame(bar, bg=self.bg_color)
+        controls.pack(anchor=tk.CENTER)
+
+        faster = self._create_button(
+            controls, "−", on_faster, width=3, height=2,
+        )
+        faster.configure(font=('Arial', 14, 'bold'))
+        if hasattr(faster, '_coloured_face'):
+            faster._coloured_face.configure(font=('Arial', 14, 'bold'))
+        faster.pack(side=tk.LEFT, padx=5)
+
+        display = self._create_label(
+            controls, f"Every {seconds:g} s", 13,
+        )
+        display.pack(side=tk.LEFT, padx=10)
+
+        slower = self._create_button(
+            controls, "+", on_slower, width=3, height=2,
+        )
+        slower.configure(font=('Arial', 14, 'bold'))
+        if hasattr(slower, '_coloured_face'):
+            slower._coloured_face.configure(font=('Arial', 14, 'bold'))
+        slower.pack(side=tk.LEFT, padx=5)
+
+        return {"slower": slower, "faster": faster, "display": display}
+
     def create_auto_layout(self, window, key, value, on_pause_resume=None,
                            on_stop=None, on_return=None):
         """Create Auto Study display, optionally with playback controls."""
@@ -530,15 +567,15 @@ class TkLayoutMaker:
         row = tk.Frame(frame, bg=self.bg_color)
         row.pack(pady=(7, 0))
         pause = self._create_button(
-            row, "Pause", on_pause_resume, width=12, height=1
+            row, "Pause", on_pause_resume, width=14, height=2
         )
         pause.pack(side=tk.LEFT, padx=5)
         stop = self._create_button(
-            row, "Stop", on_stop, width=12, height=1
+            row, "Stop", on_stop, width=14, height=2
         )
         stop.pack(side=tk.LEFT, padx=5)
         back = self._create_button(
-            row, "Return to Menu", on_return, width=16, height=1
+            row, "Return to Menu", on_return, width=16, height=2
         )
         back.pack(side=tk.LEFT, padx=5)
         return {"pause": pause, "stop": stop, "return": back, "status": status}

@@ -589,10 +589,18 @@ class GUI:
         self._review_history.record_review(card.english, card.chinese, correct, mode="input")
 
     def _input_study_surface(self):
-        """Return the shared Input Study/Review Due window (create it once)."""
+        """Return one pre-sized question/feedback window for the session.
+
+        Request the common size before laying out the first question. On macOS,
+        an initial window may otherwise appear briefly at its content size
+        before the geometry request is applied, making the first transition jump.
+        """
         window = getattr(self, '_input_study_window', None)
         if window is None or not window.winfo_exists():
             window = tk.Toplevel(self.root)
+            if not getattr(self, '_fullscreen', False):
+                window.minsize(700, 350)
+                window.geometry('700x350')
             self._input_study_window = window
             return window, True
         return window, False
@@ -608,7 +616,11 @@ class GUI:
         """Start at a common Q/feedback size; never shrink or move."""
         if first_view:
             self.set_window_size(window, 700, 350)
-        elif not self._fullscreen:
+            if not getattr(self, '_fullscreen', False):
+                window.minsize(max(700, window.winfo_reqwidth()),
+                               max(350, window.winfo_reqheight()))
+                window.update_idletasks()
+        elif not getattr(self, '_fullscreen', False):
             window.update_idletasks()
             width = max(window.winfo_width(), window.winfo_reqwidth())
             height = max(window.winfo_height(), window.winfo_reqheight())
@@ -719,93 +731,177 @@ class GUI:
         return self._show_input_feedback(card, correct=False)
 
     def auto_study(self, priority=False):
-        """Cycle flashcards with an interruptible timer and visible controls."""
-        while True:
-            self._deck_handler.shuffle_deck()
-            source = (self._deck_handler.priority_cards if priority
-                      else self._deck_handler.cards)
-            cards = self._deck_handler.filter_cards_by_category(
-                source, self._categories
-            )
-            if not cards:
-                messagebox.showinfo("Auto Study", "No cards match the selected categories.")
-                return
-
-            for card in cards:
-                window = tk.Toplevel(self.root)
-                window.title("Auto Study")
-                state = {
-                    "action": None, "paused": False, "stopped": False,
-                    "remaining": max(0.0, float(constants.AUTO_DISPLAY_DELAY_SEC)),
-                    "started": None, "timeout": None,
-                }
-
-                def cancel_timeout():
-                    if state["timeout"] is not None:
-                        window.after_cancel(state["timeout"])
-                        state["timeout"] = None
-
-                def advance():
-                    state["timeout"] = None
-                    if not state["paused"] and not state["stopped"]:
-                        state["action"] = "NEXT"
-                        window.destroy()
-
-                def schedule():
-                    state["started"] = time.monotonic()
-                    state["timeout"] = window.after(
-                        max(1, round(state["remaining"] * 1000)), advance
-                    )
-
-                def set_pause_label(text):
-                    button = controls["pause"]
-                    button.configure(text=text)
-                    if hasattr(button, "_coloured_face"):
-                        button._coloured_face.configure(text=text)
-
-                def pause_resume():
-                    if state["stopped"]:
-                        return
-                    if state["paused"]:
-                        state["paused"] = False
-                        controls["status"].configure(text="Playing")
-                        set_pause_label("Pause")
-                        schedule()
-                    else:
-                        state["paused"] = True
-                        state["remaining"] = max(
-                            0.0, state["remaining"] -
-                            (time.monotonic() - state["started"])
-                        )
-                        cancel_timeout()
-                        controls["status"].configure(text="Paused")
-                        set_pause_label("Resume")
-
-                def stop():
-                    state["stopped"] = True
-                    cancel_timeout()
-                    controls["pause"].configure(state="disabled")
-                    controls["stop"].configure(state="disabled")
-                    controls["status"].configure(
-                        text="Stopped — select Return to Menu"
-                    )
-
-                def return_to_menu():
-                    state["action"] = "RETURN"
-                    cancel_timeout()
-                    window.destroy()
-
-                controls = self._layout_maker.create_auto_layout(
-                    window, card.english, card.chinese,
-                    on_pause_resume=pause_resume, on_stop=stop,
-                    on_return=return_to_menu,
+        """Cycle Auto Study in a single persistent playback window."""
+        window = None
+        # Session-wide setting; keep the chosen speed across card transitions.
+        speed = {"seconds": max(1, min(60, round(float(constants.AUTO_DISPLAY_DELAY_SEC))))}
+        try:
+            while True:
+                self._deck_handler.shuffle_deck()
+                source = (self._deck_handler.priority_cards if priority
+                          else self._deck_handler.cards)
+                cards = self._deck_handler.filter_cards_by_category(
+                    source, self._categories
                 )
-                self.set_window_size(window, 520, 260)
-                window.protocol("WM_DELETE_WINDOW", return_to_menu)
-                schedule()
-                window.wait_window()
-                if state["action"] != "NEXT":
+                if not cards:
+                    messagebox.showinfo(
+                        "Auto Study", "No cards match the selected categories."
+                    )
                     return
+
+                for card in cards:
+                    first_view = window is None
+                    if first_view:
+                        window = tk.Toplevel(self.root)
+                    else:
+                        # Clear the old card's controls, not the outer window.
+                        for binding in ('<Return>', '<Escape>', '<space>', '<Destroy>'):
+                            window.unbind(binding)
+                        for child in window.winfo_children():
+                            child.destroy()
+
+                    if self._auto_study_card(window, card, first_view, speed) != "NEXT":
+                        return
+        finally:
+            if window is not None:
+                try:
+                    if window.winfo_exists():
+                        window.destroy()
+                except tk.TclError:
+                    pass
+
+    def _auto_study_card(self, window, card, first_view, speed):
+        """Play one card, isolating timers and callbacks from later cards."""
+        window.title("Auto Study")
+        state = {
+            "action": None, "paused": False, "stopped": False,
+            "remaining": float(speed["seconds"]),
+            "started": None, "timeout": None, "generation": 0,
+        }
+        change = tk.StringVar(master=window, value="WAIT")
+
+        def cancel_timeout():
+            state["generation"] += 1
+            timeout = state["timeout"]
+            state["timeout"] = None
+            if timeout is not None:
+                try:
+                    window.after_cancel(timeout)
+                except tk.TclError:
+                    pass  # Window may already have been destroyed.
+
+        def finish(action):
+            if state["action"] is not None:
+                return
+            state["action"] = action
+            cancel_timeout()
+            change.set(action)
+
+        def advance(generation):
+            if generation != state["generation"]:
+                return  # Ignore a canceled callback, even if it was queued already.
+            state["timeout"] = None
+            if (state["action"] is None and
+                    not state["paused"] and not state["stopped"]):
+                finish("NEXT")
+
+        def schedule():
+            state["generation"] += 1
+            generation = state["generation"]
+            state["started"] = time.monotonic()
+            state["timeout"] = window.after(
+                max(1, round(state["remaining"] * 1000)),
+                lambda: advance(generation),
+            )
+
+        def set_pause_label(text):
+            button = controls["pause"]
+            button.configure(text=text)
+            if hasattr(button, "_coloured_face"):
+                button._coloured_face.configure(text=text)
+
+        def pause_resume():
+            if state["stopped"] or state["action"] is not None:
+                return
+            if state["paused"]:
+                state["paused"] = False
+                controls["status"].configure(text="Playing")
+                set_pause_label("Pause")
+                schedule()
+            else:
+                state["paused"] = True
+                state["remaining"] = max(
+                    0.0, state["remaining"] -
+                    (time.monotonic() - state["started"])
+                )
+                cancel_timeout()
+                controls["status"].configure(text="Paused")
+                set_pause_label("Resume")
+
+        def stop():
+            if state["action"] is not None or state["stopped"]:
+                return
+            state["stopped"] = True
+            cancel_timeout()
+            controls["pause"].configure(state="disabled")
+            controls["stop"].configure(state="disabled")
+            controls["status"].configure(
+                text="Stopped — select Return to Menu"
+            )
+            for button in (speed_controls["faster"], speed_controls["slower"]):
+                button.configure(state="disabled")
+
+        def change_speed(delta):
+            if state["action"] is not None or state["stopped"]:
+                return
+            old = speed["seconds"]
+            speed["seconds"] = max(1, min(60, old + delta))
+            if speed["seconds"] == old:
+                return
+            speed_controls["display"].configure(
+                text=f"Every {speed['seconds']:g} s"
+            )
+            state["remaining"] = float(speed["seconds"])
+            # Reset the CURRENT countdown from now; stay paused if paused.
+            cancel_timeout()
+            if not state["paused"]:
+                schedule()
+
+        def return_to_menu():
+            finish("RETURN")
+
+        def unexpected_destroy(event):
+            if event.widget is window:
+                finish("RETURN")
+
+        controls = self._layout_maker.create_auto_layout(
+            window, card.english, card.chinese,
+            on_pause_resume=pause_resume, on_stop=stop,
+            on_return=return_to_menu,
+        )
+        speed_controls = self._layout_maker.create_auto_speed_controls(
+            window, speed["seconds"],
+            on_faster=lambda: change_speed(-1),
+            on_slower=lambda: change_speed(1),
+        )
+        window.protocol("WM_DELETE_WINDOW", return_to_menu)
+        window.bind('<Destroy>', unexpected_destroy)
+        if first_view:
+            self.set_window_size(window, 760, 440)
+        elif not self._fullscreen:
+            # Preserve location and dimensions; grow only for long content.
+            window.update_idletasks()
+            width = max(window.winfo_width(), window.winfo_reqwidth())
+            height = max(window.winfo_height(), window.winfo_reqheight())
+            if width > window.winfo_width() or height > window.winfo_height():
+                window.geometry(f"{width}x{height}")
+
+        schedule()
+        try:
+            window.wait_variable(change)
+        finally:
+            cancel_timeout()
+        return state["action"]
 
     def add_cards(self):
         window = tk.Toplevel(self.root)
